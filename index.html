@@ -11,6 +11,11 @@
 	<h2>Analyzing the Effects of Demographics and Behaviors on Social Media Use and Changes from 2018 to 2019</h2>
 	<script type='text/javascript' src='functions.js'></script>
 	<script type='text/javascript'>
+		d3.json('questions.json')
+			.then(function (data) {
+				questions = data;
+				plot_it();
+			})
 		//TODO: Set up data imports
 		// d3.json('2018.js')
 		// 	.then(function (data) {
@@ -20,7 +25,6 @@
 		// 	.then(function (data) {
 		// 		data_19 = data;
 		// 	})
-		plot_it();
 	</script>
 </body>
 

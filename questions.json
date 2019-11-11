@@ -1,0 +1,59 @@
+[
+    {
+        "question": "Do you use the internet or email, at least occasionally?",
+    "answers": {
+            "1": "Yes",
+            "2": "No",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "Do you access the internet on a cell phone, tablet or other mobile handheld device, at least occasionally?",
+    "answers": {
+            "1": "Yes",
+            "2": "No",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "About how often do you use the internet?",
+    "answers": {
+            "1": "Almost constantly",
+            "2": "Several times a day",
+            "3": "About once a day",
+            "4": "Several times a week",
+            "5": "Less often",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "Do you ever use social media sites like Facebook, Twitter or Instagram?",
+    "answers": {
+            "1": "Yes",
+            "2": "No",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "Next, do you have a cell phone, or not?",
+    "answers": {
+            "1": "Yes",
+            "2": "No",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "Please tell me if you ever use any of the following social media sites. ",
+    "answers": {
+            "1": "Yes",
+            "2": "No",
+            "8": "Don't know",
+            "9": "Refused"
+        }
+    },{
+        "question": "During the past 12 months, about how many BOOKS did you read either all or part of the way through? Please include any print, electronic, or audiobooks you may have read or listened to."
+    },{
+        "question": "Thinking about all of the books you have read in the past 12 months, were any of those..."
+    }
+
+]
