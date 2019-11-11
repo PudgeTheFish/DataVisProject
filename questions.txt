@@ -1,0 +1,138 @@
+Questions:
+Do you use the internet or email, at least occasionally? 
+1 Yes 
+2 No 
+8 Don't know 
+9 Refused
+
+Do you access the internet on a cell phone, tablet or other mobile handheld device, at least occasionally? 
+1 Yes 
+2 No 
+8 Don't know 
+9 Refused
+
+About how often do you use the internet?
+1 Almost constantly 
+2 Several times a day 
+3 About once a day 
+4 Several times a week
+5 Less often? 
+8 Don’t know 
+9 Refused
+
+Do you ever use social media sites like Facebook, Twitter or Instagram? 
+1 Yes 
+2 No 
+8 Don't know 
+9 Refused
+
+Next, do you have a cell phone, or not? 
+1 Yes
+2 No
+8 Don't know 
+9 Refused
+
+Is your cell phone a smartphone, or not? 
+1 Yes, smartphone 
+2 No, not a smartphone 
+8 Don't know 
+9 Refused
+
+Please tell me if you happen to have each of the following items, or not. 
+b.A tablet computer 
+c.A desktop or laptop computer 
+d.A game console
+
+Please tell me if you ever use any of the following social media sitesonline or on your cell phone.
+a.Twitter 
+b.Instagram 
+c.Facebook 
+d.Snapchat 
+e.YouTube 
+f.WhatsApp 
+g.Pinterest 
+h.LinkedIn 
+CATEGORIES 1Yes, do this 2No, do not do this 8(VOL.) Don't know 9(VOL.) Refused
+
+Please tell me if you ever use any of the following social media sites. 
+a.Twitter 
+b.Instagram 
+c.Facebook 
+d.Snapchat 
+e.YouTube 
+f.WhatsApp 
+g.Pinterest 
+h.LinkedIn
+
+During the past 12 months, about how many BOOKS did you read either all or part of the way through? Please include any print, electronic, or audiobooks you may have read or listened to. 
+Free response
+
+ASK IF READ ANY BOOKS IN PAST 12 MONTHS (BOOKS1=1-97, 98): Thinking about all of the books you have read in the past 12 months, were any of those... [INSERT ITEMS IN ORDER]?
+a. Printed books 
+b. Audiobooks 
+c. E-books
+
+RECORD RESPONDENT SEX 
+1 Male 
+2 Female 
+
+What is your age? 
+____years 
+ 
+Are you currently married, living with a partner, divorced, separated, widowed, or have you never been married? 
+1 Married 
+2 Living with a partner 
+3 Divorced 
+4 Separated 
+5 Widowed 
+6 Never been married 
+ 
+What is the highest level of school you have completed or the highest degree you have received? 
+1 Less than high school (Grades 1-8 or no formal schooling) 
+2 High school incomplete (Grades 9-11 or Grade 12 with NO diploma) 
+3 High school graduate (Grade 12 with diploma or GED certificate) 
+4 Some college, no degree (includessome community college) 
+5 Two-year associate degree from a college or university 
+6 Four-year college or university degree/Bachelor’s degree (e.g., BS, BA, AB) 
+7 Some postgraduate or professional schooling, no postgraduate degree (e.g. some graduate school) 
+8 Postgraduate or professional degree, including master’s, doctorate, medical or law degree (e.g., MA, MS, PhD, MD, JD)
+ 
+Are you now employed full-time, part-time, retired, or are you not employed for pay? 
+1 Employed full-time 
+2 Employed part-time 
+3 Retired 
+4 Not employed for pay 
+5 Have own business/self-employed 
+6 Disabled 
+7 Student 
+8 Other
+ 
+Which of the following describes your race? You can select as many as apply. White, Black or African American, Asian or Asian American or some other race. 
+1 White (e.g., Caucasian, European, Irish, Italian, Arab, Middle Eastern) 
+2 Black or African-American (e.g., Negro, Kenyan, Nigerian, Haitian) 
+3 Asian or Asian-American (e.g., Asian Indian, Chinese, Filipino, Vietnamese or other Asian origin groups) 
+4 Some other race 
+5 Native American/American Indian/Alaska Native 
+6 Pacific Islander/Native Hawaiian 
+7 Hispanic/Latino (e.g., Mexican, Puerto Rican, Cuban) 
+ 
+Last year, what was your total family income from all sources, before taxes? Just stop me when I get to the right category... 
+1 Less than $10,000 
+2 10 to under $20,000 
+3 20 to under $30,000 
+4 30 to under $40,000 
+5 40 to under $50,000 
+6 50 to under $75,000 
+7 75 to under $100,000 
+8 100 to under $150,000 
+9 $150,000 or more? 
+98(VOL.) Don't know 99(VOL.) Refused
+ 
+In politics TODAY, do you consider yourself a Republican, Democrat, or independent? 
+1 Republican 
+2 Democrat 
+3 Independent 
+4 No preference 
+5 Other party 8(VOL.) Don't know 9(VOL.) Refused
+ 
+ZIPCODE.What is your zipcode?

@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang='en'>
-	<head>
-		<meta charset='utf-8'>
-		<title>Analyzing the Effects of Demographics and Behaviors on Social Media Use and Changes from 2018 to 2019</title>
-		<script type='text/javascript' src='../d3.js'></script>
-	</head>
-	<body>
-	<svg width='600' height='800'></svg>
-	<script type='text/javascript' src='assignment1.js'></script>
+
+<head>
+	<meta charset='utf-8'>
+	<title>Analyzing the Effects of Demographics and Behaviors on Social Media Use and Changes from 2018 to 2019</title>
+	<script type='text/javascript' src='../d3.js'></script>
+</head>
+
+<body>
+	<h2>Analyzing the Effects of Demographics and Behaviors on Social Media Use and Changes from 2018 to 2019</h2>
+	<script type='text/javascript' src='functions.js'></script>
 	<script type='text/javascript'>
-		d3.json('circles.json')
-		  .then(function(data)  {
-			  points_data = data;
-			  return d3.json('bars.json');
-		  }).then(function(data)  {
-			  bars_data = data;
-			  return d3.json('boxes.json');
-		  }).then(function(data)  {
-			  boxes_data = data;
-			  plot_it();
-		  });
+		//TODO: Set up data imports
+		// d3.json('2018.js')
+		// 	.then(function (data) {
+		// 		data_18 = data;
+		// 	})
+		// d3.json('2019.js')
+		// 	.then(function (data) {
+		// 		data_19 = data;
+		// 	})
+		plot_it();
 	</script>
-	</body>
+</body>
+
 </html>
