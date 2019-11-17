@@ -2,6 +2,72 @@
 var width = 1000, height = 1000;
 var pad = 25;
 var lines_width = lines_width - (pad + pad), lines_height = lines_height - 2 * pad;
+var data = null;
+
+$(document).ready(function() {
+    $.ajax({
+        type: "GET",
+        url: "CoreTrends2018.csv",
+        dataType: "text",
+        success: function(data) {processData(data);}
+     });
+});
+
+
+// Each array contains the full set of data where the 
+// values for the specified field are all valid
+var processData = (csv) => {
+	data = $.csv.toObjects(csv);
+	var twitter = filterTwitter(data);
+	console.log("twitter data");
+	console.log(twitter);
+	var insta = filterInsta(data);
+	console.log("insta data");
+	console.log(insta);
+	var fb = filterFb(data);
+	console.log("fb data");
+	console.log(fb);
+	var snap = filterSnap(data);
+	console.log("snap data");
+	console.log(snap);
+	var yt = filterYt(data);
+	console.log("Yt data");
+	console.log(yt);
+	var intmob = filterIntmob(data);
+	console.log("intmob data");
+	console.log(intmob);
+	var books = filterBooks(data);
+	console.log("books data");
+	console.log(books);
+};
+
+var filterTwitter = (data) => {
+	return data.filter(data => parseInt(data.sns2a) >= 1 || parseInt(data.sns2a) <= 5);
+}
+
+var filterInsta = (data) => {
+	return data.filter(data => parseInt(data.sns2b) >= 1 || parseInt(data.sns2b) <= 5);
+}
+
+var filterFb = (data) => {
+	return data.filter(data => parseInt(data.sns2c) >= 1 || parseInt(data.sns2c) <= 5);
+}
+
+var filterSnap = (data) => {
+	return data.filter(data => parseInt(data.sns2d) >= 1 || parseInt(data.sns2d) <= 5);
+}
+
+var filterYt = (data) => {
+	return data.filter(data => parseInt(data.sns2e) >= 1 || parseInt(data.sns2e) <= 5);
+}
+
+var filterIntmob = (data) => {
+	return data.filter(data => parseInt(data.intmob) < 8);
+}
+
+var filterBooks = (data) => {
+	return data.filter(data => parseInt(data.books1) < 98);
+}
 
 //Create SVG elements and perform transforms to prepare for visualization
 function setup_plots() {
