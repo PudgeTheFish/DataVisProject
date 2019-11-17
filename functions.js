@@ -42,23 +42,23 @@ var processData = (csv) => {
 };
 
 var filterTwitter = (data) => {
-	return data.filter(data => parseInt(data.sns2a) >= 1 || parseInt(data.sns2a) <= 5);
+	return data.filter(data => parseInt(data.sns2a) >= 1 && parseInt(data.sns2a) <= 5);
 }
 
 var filterInsta = (data) => {
-	return data.filter(data => parseInt(data.sns2b) >= 1 || parseInt(data.sns2b) <= 5);
+	return data.filter(data => parseInt(data.sns2b) >= 1 && parseInt(data.sns2b) <= 5);
 }
 
 var filterFb = (data) => {
-	return data.filter(data => parseInt(data.sns2c) >= 1 || parseInt(data.sns2c) <= 5);
+	return data.filter(data => parseInt(data.sns2c) >= 1 && parseInt(data.sns2c) <= 5);
 }
 
 var filterSnap = (data) => {
-	return data.filter(data => parseInt(data.sns2d) >= 1 || parseInt(data.sns2d) <= 5);
+	return data.filter(data => parseInt(data.sns2d) >= 1 && parseInt(data.sns2d) <= 5);
 }
 
 var filterYt = (data) => {
-	return data.filter(data => parseInt(data.sns2e) >= 1 || parseInt(data.sns2e) <= 5);
+	return data.filter(data => parseInt(data.sns2e) >= 1 && parseInt(data.sns2e) <= 5);
 }
 
 var filterIntmob = (data) => {
