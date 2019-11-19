@@ -13,14 +13,14 @@ $(document).ready(function () {
 		url: "CoreTrends2018.csv",
 		dataType: "text",
 		success: function (data) {
-			processData(data, data_2018);
+			process2018Data(data);
 			$(document).ready(function () {
 				$.ajax({
 					type: "GET",
 					url: "CoreTrends2019.csv",
 					dataType: "text",
 					success: function (data) {
-						processData(data, data_2019);
+						process2019Data(data);
 						plot_data();
 					}
 				});
@@ -34,30 +34,25 @@ $(document).ready(function () {
 
 // Each array contains the full set of data where the 
 // values for the specified field are all valid
-var processData = (csv, obj) => { //TODO: FIX THIS OBJECT PASS BY REFERENCE AFTER THE CSV FILES ARE LOADED
-	obj = $.csv.toObjects(csv);
-	obj['twitter'] = filterTwitter(obj);
-	// console.log("twitter data");
-	// console.log(twitter);
-	obj['insta'] = filterInsta(obj);
-	// console.log("insta data");
-	// console.log(insta);
-	obj['fb'] = filterFb(obj);
-	// console.log("fb data");
-	// console.log(fb);
-	obj['snap'] = filterSnap(obj);
-	// console.log("snap data");
-	// console.log(snap);
-	obj['yt'] = filterYt(obj);
-	// console.log("Yt data");
-	// console.log(yt);
-	obj['intmob'] = filterIntmob(obj);
-	// console.log("intmob data");
-	// console.log(intmob);
-	obj['books'] = filterBooks(obj);
-	// console.log("books data");
-	// console.log(books);
-	console.log(obj)
+var process2018Data = (csv) => {
+	var obj = $.csv.toObjects(csv);
+	data_2018['twitter'] = filterTwitter(obj);
+	data_2018['insta'] = filterInsta(obj);
+	data_2018['fb'] = filterFb(obj);
+	data_2018['snap'] = filterSnap(obj);
+	data_2018['yt'] = filterYt(obj);
+	data_2018['intmob'] = filterIntmob(obj);
+	data_2018['books'] = filterBooks(obj);
+};
+var process2019Data = (csv) => {
+	var obj = $.csv.toObjects(csv);
+	data_2019['twitter'] = filterTwitter(obj);
+	data_2019['insta'] = filterInsta(obj);
+	data_2019['fb'] = filterFb(obj);
+	data_2019['snap'] = filterSnap(obj);
+	data_2019['yt'] = filterYt(obj);
+	data_2019['intmob'] = filterIntmob(obj);
+	data_2019['books'] = filterBooks(obj);
 };
 
 var filterTwitter = (data) => {
@@ -92,8 +87,8 @@ var filterBooks = (data) => {
 function setup_plots() {
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
 
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot1')
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot2')
+	d3.select('svg').append('g').attr('transform', 'translate(' + 2 * pad + ',' + pad + ')').attr('id', 'plot1')
+	d3.select('svg').append('g').attr('transform', 'translate(' + (lines_width + (3 * pad)) + ',' + pad + ')').attr('id', 'plot2')
 
 	// group that will contain y axis for our line plot (id: yaxis)
 	d3.select('#plot1').append('g').attr('id', 'yaxis')
@@ -121,33 +116,40 @@ function populate_dropdown() {
 }
 
 function plot_data() {
-	// console.log(data_2018);
-	// console.log(data_2019)
 	var plot1 = d3.select('#plot1');
 	var plot2 = d3.select('#plot2');
 
-	var x_scale = d3.scaleLinear().domain([0, data_2018.books.length]).range([0, lines_width]);
-	var y_scale = d3.scaleLinear().domain([0, d3.max(books, d => d.books1)]).range([lines_height - pad, 0]);
+	var x_scale = d3.scaleLinear().domain([0, data_2018["books"].length]).range([0, lines_width]);
+	var y_scale = d3.scaleLinear().domain([0, d3.max(data_2018["books"], d => d.books1)]).range([lines_height - pad, 0]);
 	// var salary_scale = d3.scaleLinear().domain([0, all_maxs['Salary']]).range([0, name_bar_pos]);
 
-	plot1.selectAll('g').data(data_2018.books).enter()
+	plot1.selectAll('g').data(data_2018['books']).enter()
 		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
 		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
 		.attr('fill', '#fffff');
 
 	plot1.select('#yaxis').call(d3.axisLeft(y_scale));
+	plot1.select('#yaxis').append("text")
+		.attr("transform", "rotate(-90)")
+		.attr("y", -pad)
+		.attr("x", -lines_height / 2)
+		.style("text-anchor", "middle")
+		.text("Number of books read")
+		.attr('font-size', '12px')
+		.attr('fill', 'black');
 	plot1.select('#xaxis').append('text')
 		.attr('transform', 'translate(' + lines_width / 2 + ',' + lines_height + ')')
 		.attr('fill', '#fffff').text('2018 Respondent');
 
-	plot2.selectAll('g').data(data_2019.books).enter()
+	plot2.selectAll('g').data(data_2019['books']).enter()
 		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
 		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
 		.attr('fill', '#fffff');
 
-	plot2.select('#yaxis').call(d3.axisLeft(y_scale));
+	// plot2.select('#yaxis').call(d3.axisLeft(y_scale));
+
 	plot2.select('#xaxis').append('text')
-		.attr('transform', 'translate(' + lines_width / 2 + ',' + lines_height + ')')
+		.attr('transform', 'translate(' + (lines_width / 2 - pad) + ',' + lines_height + ')')
 		.attr('fill', '#fffff').text('2019 Respondent');
 }
 
