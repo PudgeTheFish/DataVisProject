@@ -100,7 +100,7 @@ var filterBooks = (data) => {
 }
 
 //Create SVG elements and perform transforms to prepare for visualization
-function setup_plots() {
+function setup_line_plots() {
 	d3.select('body').append('div').attr('id', 'filters');
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
 
@@ -110,37 +110,50 @@ function setup_plots() {
 
 	d3.select('#filters').append('text').text('Filters');
 
-	d3.select('#filters').append('div')
-		.attr('id', 'raceCheckbox')
-		.append('text').text('Race: ')
-	d3.select('#filters').select('#raceCheckbox')
-		.selectAll("input")
-		.data(["White", "Black", "Asian", "Other", "Native American", "Pacific Islander", "Hispanic"])
+	d3.select('#filters').append('form')
+		.selectAll("label")
+		.data(["Race", "Sex"])
 		.enter()
-		.append('label')
-		.attr('for', function (d, i) { return i + 1; })
+		.append("label")
 		.text(function (d) { return d; })
-		.append("input")
-		.attr("checked", true)
-		.attr("type", "checkbox")
-		.attr("id", function (d, i) { return i + 1; })
-		.attr("onClick", "handleUpdate()");
+		.insert('input')
+		.attr("type", "radio")
+		.attr("id", function (d, i) { return d; })
+		.attr('name', 'mode')
+		.attr("onClick", "handleUpdate(this)")
+		.property("checked", function (d, i) { return i === 0; });
 
-	d3.select('#filters').append('div')
-		.attr('id', 'sexCheckbox')
-		.append('text').text('Sex: ')
-	d3.select('#filters').select('#sexCheckbox')
-		.selectAll("input")
-		.data(["Male", "Female"])
-		.enter()
-		.append('label')
-		.attr('for', function (d, i) { return i + 1; })
-		.text(function (d) { return d; })
-		.append("input")
-		.attr("checked", true)
-		.attr("type", "checkbox")
-		.attr("id", function (d, i) { return i + 1; })
-		.attr("onClick", "handleUpdate()");
+	// d3.select('#filters').append('div')
+	// 	.attr('id', 'raceCheckbox')
+	// 	.append('text').text('Race: ')
+	// d3.select('#filters').select('#raceCheckbox')
+	// 	.selectAll("input")
+	// 	.data(["White", "Black", "Asian", "Other", "Native American", "Pacific Islander", "Hispanic"])
+	// 	.enter()
+	// 	.append('label')
+	// 	.attr('for', function (d, i) { return i + 1; })
+	// 	.text(function (d) { return d; })
+	// 	.append("input")
+	// 	.attr("checked", true)
+	// 	.attr("type", "checkbox")
+	// 	.attr("id", function (d, i) { return i + 1; })
+	// 	.attr("onClick", "handleUpdate()");
+
+	// d3.select('#filters').append('div')
+	// 	.attr('id', 'sexCheckbox')
+	// 	.append('text').text('Sex: ')
+	// d3.select('#filters').select('#sexCheckbox')
+	// 	.selectAll("input")
+	// 	.data(["Male", "Female"])
+	// 	.enter()
+	// 	.append('label')
+	// 	.attr('for', function (d, i) { return i + 1; })
+	// 	.text(function (d) { return d; })
+	// 	.append("input")
+	// 	.attr("checked", true)
+	// 	.attr("type", "checkbox")
+	// 	.attr("id", function (d, i) { return i + 1; })
+	// 	.attr("onClick", "handleUpdate()");
 
 
 	// group that will contain y axis for our line plot (id: yaxis)
@@ -155,9 +168,59 @@ function setup_plots() {
 
 }
 
-function handleUpdate() {
-	console.log(d3.select('#filters'))
-
+function handleUpdate(e) {
+	switch (e.id) {
+		case "Sex":
+			filteredData18 = d3.nest()
+				.key(d => { return d.sex })
+				.rollup(v => {
+					var arr = {};
+					arr["Twitter"] = {
+						1: v.filter(data => parseInt(data.sns2a) == 1).length/v.length,
+						2: v.filter(data => parseInt(data.sns2a) == 2).length/v.length,
+						3: v.filter(data => parseInt(data.sns2a) == 3).length/v.length,
+						4: v.filter(data => parseInt(data.sns2a) == 4).length/v.length,
+						5: v.filter(data => parseInt(data.sns2a) == 5).length/v.length,
+					}
+					arr["Instagram"] = {
+						1: v.filter(data => parseInt(data.sns2b) == 1).length/v.length,
+						2: v.filter(data => parseInt(data.sns2b) == 2).length/v.length,
+						3: v.filter(data => parseInt(data.sns2b) == 3).length/v.length,
+						4: v.filter(data => parseInt(data.sns2b) == 4).length/v.length,
+						5: v.filter(data => parseInt(data.sns2) == 5).length/v.length,
+					}
+					// 	d3.count(v, v => v.web1a)/filteredData18.length;
+					// arr["Instagram"] = d3.count(v => v.web1b)/filteredData18.length;
+					// arr["Facebook"] = d3.count(v => v.web1c)/filteredData18.length;
+					// arr["Snapchat"] = d3.count(v => v.web1d)/filteredData18.length;
+					// arr["YouTube"] = d3.count(v => v.web1e)/filteredData18.length;
+					return arr;
+				})
+				.entries(data18);
+			filteredData19 = d3.nest()
+				.key(d => { return d.sex })
+				.entries(data19);
+			// d3.rollup(filteredData18, v => {
+			// 	var arr = {};
+			// 	arr["Twitter"] = d3.count(v.web1a)/filteredData18.length;
+			// 	arr["Instagram"] = d3.count(v.web1b)/filteredData18.length;
+			// 	arr["Facebook"] = d3.count(v.web1c)/filteredData18.length;
+			// 	arr["Snapchat"] = d3.count(v.web1d)/filteredData18.length;
+			// 	arr["YouTube"] = d3.count(v.web1e)/filteredData18.length;
+			// 	return arr;
+			// }, d => d.key)
+			console.log(filteredData18);
+			break;
+		case "Race":
+			filteredData18 = d3.nest()
+				.key(d => { return d.racecmb })
+				.entries(data18);
+			filteredData19 = d3.nest()
+				.key(d => { return d.racecmb })
+				.entries(data19);
+			break;
+	}
+	plot_sm_lines();
 }
 
 function populate_dropdown() {
@@ -213,7 +276,17 @@ function filterData() {
 }
 
 function plot_sm_lines() {
+	console.log("PLOTTING DATA");
 
+	var plot1 = d3.select('#plot1');
+
+	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width/2]);
+	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height/2 - pad, 0]);
+
+	for(i =0; i < filteredData18.length; i++) {
+		plot1.data(filteredData18[i]).enter()
+			.append()
+	}
 }
 
 function plot_it() {
