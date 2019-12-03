@@ -4,39 +4,47 @@ var pad = 25;
 var lines_width = width / 2 - (2 * pad);
 var lines_height = height / 2 - (2 * pad);
 var data = null;
-var data_2018 = null;
-var data_2019 = null;
-
-$(document).ready(function () {
-	$.ajax({
-		type: "GET",
-		url: "CoreTrends2018.csv",
-		dataType: "text",
-		success: function (data) {
-			//processData(data, data_2018);
-			$(document).ready(function () {
-				$.ajax({
-					type: "GET",
-					url: "CoreTrends2019.csv",
-					dataType: "text",
-					success: function (data) {
-						processData(data, data_2019);
-						//plot_data();
-					}
-				});
-			});
-		}
-	});
-});
+var data18 = null; // contains 2018 data in json object
+var data19 = null; // contains 2019 data in json object
 
 
+function loadJSON(callback, filename) {   
 
+    var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+    xobj.open('GET', filename, false); // Replace 'appDataServices' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+}
+
+
+function init() {
+	 console.log("INIT");
+	loadJSON(function(response) {
+	 // Parsing JSON string into object
+	   data18 = JSON.parse(response);
+	   console.log(data18);
+	}, 'data_2018.json');
+
+	loadJSON(function(response) {
+		// Parsing JSON string into object
+		  data19 = JSON.parse(response);
+		  console.log(data19);
+	   }, 'data_2019.json');
+}
+
+init();
 
 // Each array contains the full set of data where the 
 // values for the specified field are all valid
 var processData = (csv, obj) => { 
 	obj = $.csv.toObjects(csv);
-	console.log(obj);
+	//console.log(obj);
 	//obj = filterTwitter(obj);
 	// console.log("twitter data");
 	// console.log(twitter);
