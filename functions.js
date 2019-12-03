@@ -6,43 +6,45 @@ var lines_height = height / 2 - (2 * pad);
 var data = null;
 var data18 = null; // contains 2018 data in json object
 var data19 = null; // contains 2019 data in json object
+var filteredData18 = null; //contains filtered object
+var filteredData19 = null; //contains filtered object
 
 
-function loadJSON(callback, filename) {   
+function loadJSON(callback, filename) {
 
-    var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-    xobj.open('GET', filename, false); // Replace 'appDataServices' with the path to your file
-    xobj.onreadystatechange = function () {
-          if (xobj.readyState == 4 && xobj.status == "200") {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
-          }
-    };
-    xobj.send(null);  
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', filename, false); // Replace 'appDataServices' with the path to your file
+	xobj.onreadystatechange = function () {
+		if (xobj.readyState == 4 && xobj.status == "200") {
+			// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+			callback(xobj.responseText);
+		}
+	};
+	xobj.send(null);
 }
 
 
 function init() {
-	 console.log("INIT");
-	loadJSON(function(response) {
-	 // Parsing JSON string into object
-	   data18 = JSON.parse(response);
-	   console.log(data18);
+	console.log("INIT");
+	loadJSON(function (response) {
+		// Parsing JSON string into object
+		data18 = JSON.parse(response);
+		console.log(data18);
 	}, 'data_2018.json');
 
-	loadJSON(function(response) {
+	loadJSON(function (response) {
 		// Parsing JSON string into object
-		  data19 = JSON.parse(response);
-		  console.log(data19);
-	   }, 'data_2019.json');
+		data19 = JSON.parse(response);
+		console.log(data19);
+	}, 'data_2019.json');
 }
 
 init();
 
 // Each array contains the full set of data where the 
 // values for the specified field are all valid
-var processData = (csv, obj) => { 
+var processData = (csv, obj) => {
 	obj = $.csv.toObjects(csv);
 	//console.log(obj);
 	//obj = filterTwitter(obj);
@@ -94,25 +96,67 @@ var filterIntmob = (data) => {
 }
 
 var filterBooks = (data) => {
-	return data.filter(data => parseInt(data.books1) < 98);
+	data['books'] = data.filter(data => parseInt(data.books1) < 98);
 }
 
 //Create SVG elements and perform transforms to prepare for visualization
 function setup_plots() {
+	d3.select('body').append('div').attr('id', 'filters');
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
 
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot1')
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot2')
+	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot1');
+	d3.select('svg').append('g').attr('transform', 'translate(' + (3 * pad + lines_width) + ',' + pad + ')').attr('id', 'plot2');
+
+
+	d3.select('#filters').append('text').text('Filters');
+
+	d3.select('#filters').append('div')
+		.attr('id', 'raceCheckbox')
+		.append('text').text('Race: ')
+	d3.select('#filters').select('#raceCheckbox')
+		.selectAll("input")
+		.data(["White", "Black", "Asian", "Other", "Native American", "Pacific Islander", "Hispanic"])
+		.enter()
+		.append('label')
+		.attr('for', function (d, i) { return i + 1; })
+		.text(function (d) { return d; })
+		.append("input")
+		.attr("checked", true)
+		.attr("type", "checkbox")
+		.attr("id", function (d, i) { return i + 1; })
+		.attr("onClick", "handleUpdate()");
+
+	d3.select('#filters').append('div')
+		.attr('id', 'sexCheckbox')
+		.append('text').text('Sex: ')
+	d3.select('#filters').select('#sexCheckbox')
+		.selectAll("input")
+		.data(["Male", "Female"])
+		.enter()
+		.append('label')
+		.attr('for', function (d, i) { return i + 1; })
+		.text(function (d) { return d; })
+		.append("input")
+		.attr("checked", true)
+		.attr("type", "checkbox")
+		.attr("id", function (d, i) { return i + 1; })
+		.attr("onClick", "handleUpdate()");
+
 
 	// group that will contain y axis for our line plot (id: yaxis)
-	d3.select('#plot1').append('g').attr('id', 'yaxis')
+	d3.select('#plot1').append('g').attr('id', 'yaxis');
 	// group that will contain x axis for both our line plot and heatmap (id: xaxis)
-	d3.select('#plot1').append('g').attr('id', 'xaxis')
+	d3.select('#plot1').append('g').attr('id', 'xaxis');
 
 	// group that will contain y axis for our line plot (id: yaxis)
-	d3.select('#plot2').append('g').attr('id', 'yaxis')
+	d3.select('#plot2').append('g').attr('id', 'yaxis');
 	// group that will contain x axis for both our line plot and heatmap (id: xaxis)
-	d3.select('#plot2').append('g').attr('id', 'xaxis')
+	d3.select('#plot2').append('g').attr('id', 'xaxis');
+
+}
+
+function handleUpdate() {
+	console.log(d3.select('#filters'))
 
 }
 
@@ -129,51 +173,55 @@ function populate_dropdown() {
 	// 	})
 }
 
-function plot_data() {
-	// console.log(data_2018);
+function plot_books() {
+
+	//filter data
+	filterBooks(data18);
+	filterBooks(data19);
 
 	console.log("PLOTTING DATA");
-	var data = data_2018;
 
-	var subgroups = data.columns.slice(1);
-	console.log(subgroups);
 	var plot1 = d3.select('#plot1');
 	var plot2 = d3.select('#plot2');
 
-	var x_scale = d3.scaleLinear().domain([0, data_2018.books.length]).range([0, lines_width]);
-	var y_scale = d3.scaleLinear().domain([0, d3.max(books, d => d.books1)]).range([lines_height - pad, 0]);
-	// var salary_scale = d3.scaleLinear().domain([0, all_maxs['Salary']]).range([0, name_bar_pos]);
-	plot1.selectAll('g').data(data_2018.books).enter()
+	var x_scale = d3.scaleLinear().domain([0, data18.books.length]).range([0, lines_width]);
+	var y_scale = d3.scaleLinear().domain([0, d3.max(data18.books, d => d.books1)]).range([lines_height - pad, 0]);
+
+	plot1.selectAll('g').data(data18.books).enter()
 		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
 		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
 		.attr('fill', '#fffff');
 
 	plot1.select('#yaxis').call(d3.axisLeft(y_scale));
 	plot1.select('#xaxis').append('text')
-		.attr('transform', 'translate(' + lines_width / 2 + ',' + lines_height + ')')
+		.attr('transform', 'translate(' + 0 + ',' + lines_height + ')')
 		.attr('fill', '#fffff').text('2018 Respondent');
 
-	plot2.selectAll('g').data(data_2019.books).enter()
+	plot2.selectAll('g').data(data19.books).enter()
 		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
 		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
 		.attr('fill', '#fffff');
 
 	plot2.select('#yaxis').call(d3.axisLeft(y_scale));
 	plot2.select('#xaxis').append('text')
-		.attr('transform', 'translate(' + lines_width / 2 + ',' + lines_height + ')')
+		.attr('transform', 'translate(' + 0 + ',' + lines_height + ')')
 		.attr('fill', '#fffff').text('2019 Respondent');
+}
+
+function filterData() {
+
+}
+
+function plot_sm_lines() {
+
 }
 
 function plot_it() {
 
 	populate_dropdown();
 	setup_plots();
-	// d3.csv('CoreTrends2018.csv').then(data => {
-	// 	// data = $.csv.toObjects(data);
-	// 	console.log(data)
-	// 	processData(data);
-	// 	plot_data();
-	// })
+	plot_books();
+
 
 
 }
