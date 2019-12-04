@@ -8,7 +8,14 @@ var data18 = null; // contains 2018 data in json object
 var data19 = null; // contains 2019 data in json object
 var filteredData18 = null; //contains filtered object
 var filteredData19 = null; //contains filtered object
-var socials = ["Twitter", "Instagram", "Facebook", "Snapchat", "YouTube"];
+var socials = [
+	{ name: "Twitter", code: "sns2a" },
+	{ name: "Instagram", code: "sns2b" },
+	{ name: "Facebook", code: "sns2c" },
+	{ name: "Snapchat", code: "sns2d" },
+	{ name: "YouTube", code: "sns2e" }
+];
+var socialKeys = ["sns2a", "sns2b", "sns2c", "sns2d", "sns2e"];
 
 
 function loadJSON(callback, filename) {
@@ -111,9 +118,9 @@ function setup_line_plots() {
 
 var createSocialArr = (arr,v) => {
 	socials.map(s => {
-		arr[s] = [];
+		arr[s.name] = [];
 		for (var i=1; i<=5; i++) {
-			arr[s].push({ key: i, value: v.filter(data => parseInt(data.sns2a) == i).length / v.length});
+			arr[s.name].push({ key: i, value: v.filter(data => parseInt(data[s.code]) == i).length / v.length});
 		}
 	});
 	return arr;
@@ -168,17 +175,18 @@ function plot_sm_lines() {
 	var svg = d3.select('#svg');
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
-	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height / 2 - pad, 0]);
+	var y_scale = d3.scaleLinear().domain([0, .1]).range([lines_height / 2 - pad, 0]);
 
 	var lineFunction = d3.line()
 		.x(d => { /*console.log(d);*/ return x_scale(d.key) })
 		.y(d => { return y_scale(d.value) })
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot');
-		//console.log(filteredData18[i].value);
+		console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach(sm => {
 			// get the array we want
-			arr = filteredData18[i].value[sm];		
+			arr = filteredData18[i].value[sm];
+			//console.log(arr);		
 			plot.append('path')
 				.datum(arr)
 				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => y_scale(d.value)))
