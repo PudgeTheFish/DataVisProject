@@ -53,6 +53,8 @@ var handleLinesButt = () => {
 	toggleLines = true;
 	d3.select("#linesButton").attr("style", "background-color: #35c7f0");
 	d3.select("#barsButton").attr("style", "background-color: #d9d9d9");
+	d3.selectAll("#filters").remove();
+	d3.selectAll("#barsParent").remove();
 	setup_line_plots();
 };
 
