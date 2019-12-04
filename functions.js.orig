@@ -1,8 +1,6 @@
 // widths and heights for our plots - you should use these in constructing scales
 var width = 1500, height = 1500;
 var pad = 80;
-var width = 1000, height = 1000;
-var pad = 25;
 var lines_width = width / 2 - (2 * pad);
 var lines_height = height / 2 - (2 * pad);
 var data = null;
@@ -17,6 +15,7 @@ var socials = [
 	{ name: "Snapchat", code: "sns2d" },
 	{ name: "YouTube", code: "sns2e" }
 ];
+var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer Not To Answer"];
 var toggleLines = true; // set to true for line graphs, false for bar graphs
 
 function loadJSON(callback, filename) {
@@ -265,5 +264,11 @@ function plot_sm_lines() {
 		.style("font-size", "15px")
 		.attr("alignment-baseline", "middle")
 	// svg.append("text").attr("x", 220).attr("y", 160).text("variable B").style("font-size", "15px").attr("alignment-baseline", "middle")
+
+}
+
+function plot_it() {
+
+	setup_line_plots();
 
 }
