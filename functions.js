@@ -99,7 +99,7 @@ function setup_line_plots() {
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
 
 	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
-	
+
 	// d3.select('#filters').append('div')
 	// 	.attr('id', 'raceCheckbox')
 	// 	.append('text').text('Race: ')
@@ -117,11 +117,11 @@ function setup_line_plots() {
 	// 	.attr("onClick", "handleUpdate()");
 }
 
-var createSocialArr = (arr,v) => {
+var createSocialArr = (arr, v) => {
 	socials.map(s => {
 		arr[s] = [];
-		for (var i=1; i<=5; i++) {
-			arr[s].push({ key: i, value: v.filter(data => parseInt(data.sns2a) == i).length / v.length});
+		for (var i = 1; i <= 5; i++) {
+			arr[s].push({ key: i, value: v.filter(data => parseInt(data.sns2a) == i).length / v.length });
 		}
 	});
 	return arr;
@@ -134,7 +134,7 @@ function handleUpdate(e) {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr(arr, v);
 					return arr;
 				})
 				.entries(data18);
@@ -142,7 +142,7 @@ function handleUpdate(e) {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr(arr, v);
 					return arr;
 				})
 				.entries(data19);
@@ -152,7 +152,7 @@ function handleUpdate(e) {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr(arr, v);
 					return arr;
 				})
 				.entries(data18);
@@ -160,7 +160,7 @@ function handleUpdate(e) {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr(arr, v);
 					return arr;
 				})
 				.entries(data19);
@@ -180,28 +180,32 @@ function plot_sm_lines() {
 	var y_scale = d3.scaleLinear().domain([0, .3]).range([lines_height / 2 - pad, 0]);
 
 	for (i = 0; i < filteredData18.length; i++) {
-		let plot = svg.append('g').attr('id', 'plot');
+		let plot = svg.append('g').attr('id', 'plot')
+			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad)) + ',' + 0 + ')');
 		//console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach(sm => {
 			console.log(sm)
 			// get the array we want
-			arr = filteredData18[i].value[sm];	
+			arr = filteredData18[i].value[sm];
 			plot.append('path')
 				.datum(arr)
-				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => {console.log(d.value); return y_scale(d.value)}))
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { console.log(d.value); return y_scale(d.value) }))
 				.attr("fill", "none")
 				.attr("stroke", "steelblue")
 				.attr("stroke-width", 1.5);
 		});
 
-		// group that will contain y axis for our line plot (id: yaxis)
-		plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
-		let  yaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
+		if (i == 0) {
+			// group that will contain y axis for our line plot (id: yaxis)
+			plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
+			let yaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
+		}
+		
 		// group that will contain x axis for both our line plot and heatmap (id: xaxis)
 		plot.append('g').attr('id', 'xaxis')
 			.call(d3.axisBottom(x_scale).ticks(5)
-			.tickFormat(i => { return yaxis[i - 1] }))
-			.attr('transform', 'translate(0' + ',' + (lines_height/2 - pad) + ')');
+				.tickFormat(i => { return yaxis[i - 1] }))
+			.attr('transform', 'translate(0' + ',' + (lines_height / 2 - pad) + ')');
 	}
 }
 
