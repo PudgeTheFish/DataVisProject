@@ -1,6 +1,6 @@
 // widths and heights for our plots - you should use these in constructing scales
-var width = 1000, height = 1000;
-var pad = 25;
+var width = 1500, height = 1500;
+var pad = 80;
 var lines_width = width / 2 - (2 * pad);
 var lines_height = height / 2 - (2 * pad);
 var data = null;
@@ -15,6 +15,7 @@ var socials = [
 	{ name: "Snapchat", code: "sns2d" },
 	{ name: "YouTube", code: "sns2e" }
 ];
+var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer Not To Answer"];
 
 function loadJSON(callback, filename) {
 
@@ -92,6 +93,9 @@ var setupFilters = () => {
 		.attr('name', 'mode')
 		.attr("onClick", "handleUpdate(this)")
 		.property("checked", function (d, i) { return i === 0; });
+
+	document.getElementById("Race").checked = true;
+	handleUpdate(document.getElementById("Race"))
 };
 
 //Create SVG elements and perform transforms to prepare for visualization
@@ -120,9 +124,9 @@ function setup_line_plots() {
 
 var createSocialArr = (arr, v) => {
 	socials.map(s => {
-		arr[s] = [];
+		arr[s.name] = [];
 		for (var i = 1; i <= 5; i++) {
-			arr[s].push({ key: i, value: v.filter(data => parseInt(data.sns2a) == i).length / v.length });
+			arr[s.name].push({ key: i, value: v.filter(data => parseInt(data[s.code]) == i).length / v.length });
 		}
 	});
 	return arr;
@@ -178,41 +182,65 @@ function plot_sm_lines() {
 	svg.selectAll('g').remove(); //clear plots
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
-	var y_scale = d3.scaleLinear().domain([0, .3]).range([lines_height / 2 - pad, 0]);
+	var y_scale = d3.scaleLinear().domain([0, .5]).range([lines_height / 2 - pad, 0]);
+	var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#E74C3C", "#8E44AD", "#3498DB", "#1ABC9C", "#F39C12"]);
 
 	for (i = 0; i < filteredData18.length; i++) {
-<<<<<<< HEAD
 		let plot = svg.append('g').attr('id', 'plot')
-			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad)) + ',' + 0 + ')');
-=======
-		let plot = svg.append('g').attr('id', 'plot');
->>>>>>> ca5afb15870e00db6fae38ebf626ac746cf27718
+			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad - 20)) + ',' + (Math.trunc(i / 2 % 3) * (lines_height / 2 - pad / 2)) + ')');
+
+		if (filteredData18.length == 2) {
+			var sexes = ["Male", "Female"]
+			plot.append('text').text(sexes[i])
+				.attr('text-anchor', 'center')
+				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 2 + ')');
+		} else if (filteredData18.length == 6) {
+			plot.append('text').text(races[i])
+				.attr('text-anchor', 'center')
+				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 2 + ')');
+		}
+
 		//console.log(filteredData18[i].value);
-		Object.keys(filteredData18[i].value).forEach(sm => {
-			console.log(sm)
+		Object.keys(filteredData18[i].value).forEach((sm, index) => {
 			// get the array we want
-			arr = filteredData18[i].value[sm];	
+			arr = filteredData18[i].value[sm];
 			plot.append('path')
 				.datum(arr)
-				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => {console.log(d.value); return y_scale(d.value)}))
+				.attr('data-legend', sm)
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { return y_scale(d.value) }))
 				.attr("fill", "none")
-				.attr("stroke", "steelblue")
-				.attr("stroke-width", 1.5);
+				.attr("stroke", colorScale(index))
+				.attr("stroke-width", 3);
 		});
 
-		if (i == 0) {
+		if (i == 0 || i == 2 || i == 4) {
 			// group that will contain y axis for our line plot (id: yaxis)
 			plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
 		}
-		
-		let xaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
+
+		let yaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
 		// group that will contain x axis for both our line plot and heatmap (id: xaxis)
 		plot.append('g').attr('id', 'xaxis')
-			.call(d3.axisBottom(x_scale).ticks(5)
-				.tickFormat(i => { return xaxis[i - 1] }))
-			.attr('transform', 'translate(0' + ',' + (lines_height / 2 - pad) + ')');
+			.call(d3.axisTop(x_scale).ticks(5)
+				.tickFormat(i => { return yaxis[i - 1] }))
+			.attr('transform', 'translate(0' + ',' + 0 + ')');
 	}
+	//add legend
+	svg.append('g').selectAll('circle').data(socials).enter()
+		.append('circle')
+		.attr("cx", lines_width + pad * 1.5).attr("cy", (d, i) => 100 + i * 30)
+		.attr("r", 6).style("fill", (d, i) => { console.log(d); return colorScale(i) })
+	svg.append('g').selectAll('text').data(socials).enter()
+		.append("text")
+		.attr("x", lines_width + pad * 1.6)
+		.attr("y", (d, i) => 100 + i * 30)
+		.text(d => d.name)
+		.style("font-size", "15px")
+		.attr("alignment-baseline", "middle")
+	// svg.append("text").attr("x", 220).attr("y", 160).text("variable B").style("font-size", "15px").attr("alignment-baseline", "middle")
+
 }
+
 function plot_it() {
 
 	setup_line_plots();
