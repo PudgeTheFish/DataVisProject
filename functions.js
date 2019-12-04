@@ -316,44 +316,7 @@ function handleUpdate(e) {
 	}
 	plot_sm_lines();
 }
-function plot_books() {
 
-	//filter data
-	filterBooks(data18);
-	filterBooks(data19);
-
-	console.log("PLOTTING DATA");
-
-	var plot1 = d3.select('#plot1');
-	var plot2 = d3.select('#plot2');
-
-	var x_scale = d3.scaleLinear().domain([0, data18.books.length]).range([0, lines_width]);
-	var y_scale = d3.scaleLinear().domain([0, d3.max(data18.books, d => d.books1)]).range([lines_height - pad, 0]);
-
-	plot1.selectAll('g').data(data18.books).enter()
-		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
-		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
-		.attr('fill', '#fffff');
-
-	plot1.select('#yaxis').call(d3.axisLeft(y_scale));
-	plot1.select('#xaxis').append('text')
-		.attr('transform', 'translate(' + 0 + ',' + lines_height + ')')
-		.attr('fill', '#fffff').text('2018 Respondent');
-
-	plot2.selectAll('g').data(data19.books).enter()
-		.append('circle').attr('cx', (d, i) => { return x_scale(i) })
-		.attr('cy', d => y_scale(d.books1)).attr('r', 2)
-		.attr('fill', '#fffff');
-
-	plot2.select('#yaxis').call(d3.axisLeft(y_scale));
-	plot2.select('#xaxis').append('text')
-		.attr('transform', 'translate(' + 0 + ',' + lines_height + ')')
-		.attr('fill', '#fffff').text('2019 Respondent');
-}
-
-function filterData() {
-
-}
 
 function plot_sm_lines() {
 	console.log("PLOTTING DATA");
