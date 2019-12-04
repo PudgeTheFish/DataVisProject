@@ -104,8 +104,7 @@ function setup_line_plots() {
 	d3.select('body').append('div').attr('id', 'filters');
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
 
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'plot1');
-	d3.select('svg').append('g').attr('transform', 'translate(' + (3 * pad + lines_width) + ',' + pad + ')').attr('id', 'plot2');
+	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
 
 
 	d3.select('#filters').append('text').text('Filters');
@@ -138,34 +137,6 @@ function setup_line_plots() {
 	// 	.attr("type", "checkbox")
 	// 	.attr("id", function (d, i) { return i + 1; })
 	// 	.attr("onClick", "handleUpdate()");
-
-	// d3.select('#filters').append('div')
-	// 	.attr('id', 'sexCheckbox')
-	// 	.append('text').text('Sex: ')
-	// d3.select('#filters').select('#sexCheckbox')
-	// 	.selectAll("input")
-	// 	.data(["Male", "Female"])
-	// 	.enter()
-	// 	.append('label')
-	// 	.attr('for', function (d, i) { return i + 1; })
-	// 	.text(function (d) { return d; })
-	// 	.append("input")
-	// 	.attr("checked", true)
-	// 	.attr("type", "checkbox")
-	// 	.attr("id", function (d, i) { return i + 1; })
-	// 	.attr("onClick", "handleUpdate()");
-
-
-	// group that will contain y axis for our line plot (id: yaxis)
-	d3.select('#plot1').append('g').attr('id', 'yaxis');
-	// group that will contain x axis for both our line plot and heatmap (id: xaxis)
-	d3.select('#plot1').append('g').attr('id', 'xaxis');
-
-	// group that will contain y axis for our line plot (id: yaxis)
-	d3.select('#plot2').append('g').attr('id', 'yaxis');
-	// group that will contain x axis for both our line plot and heatmap (id: xaxis)
-	d3.select('#plot2').append('g').attr('id', 'xaxis');
-
 }
 
 function handleUpdate(e) {
@@ -176,66 +147,175 @@ function handleUpdate(e) {
 				.rollup(v => {
 					var arr = {};
 					arr["Twitter"] = {
-						1: v.filter(data => parseInt(data.sns2a) == 1).length/v.length,
-						2: v.filter(data => parseInt(data.sns2a) == 2).length/v.length,
-						3: v.filter(data => parseInt(data.sns2a) == 3).length/v.length,
-						4: v.filter(data => parseInt(data.sns2a) == 4).length/v.length,
-						5: v.filter(data => parseInt(data.sns2a) == 5).length/v.length,
+						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
 					}
 					arr["Instagram"] = {
-						1: v.filter(data => parseInt(data.sns2b) == 1).length/v.length,
-						2: v.filter(data => parseInt(data.sns2b) == 2).length/v.length,
-						3: v.filter(data => parseInt(data.sns2b) == 3).length/v.length,
-						4: v.filter(data => parseInt(data.sns2b) == 4).length/v.length,
-						5: v.filter(data => parseInt(data.sns2) == 5).length/v.length,
+						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
 					}
-					// 	d3.count(v, v => v.web1a)/filteredData18.length;
-					// arr["Instagram"] = d3.count(v => v.web1b)/filteredData18.length;
-					// arr["Facebook"] = d3.count(v => v.web1c)/filteredData18.length;
-					// arr["Snapchat"] = d3.count(v => v.web1d)/filteredData18.length;
-					// arr["YouTube"] = d3.count(v => v.web1e)/filteredData18.length;
+					arr["Facebook"] = {
+						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
+					}
+					arr["Snapchat"] = {
+						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
+					}
+					arr["YouTube"] = {
+						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
+					}
 					return arr;
 				})
 				.entries(data18);
 			filteredData19 = d3.nest()
 				.key(d => { return d.sex })
+				.rollup(v => {
+					var arr = {};
+					arr["Twitter"] = {
+						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
+					}
+					arr["Instagram"] = {
+						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
+					}
+					arr["Facebook"] = {
+						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
+					}
+					arr["Snapchat"] = {
+						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
+					}
+					arr["YouTube"] = {
+						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
+					}
+					return arr;
+				})
 				.entries(data19);
-			// d3.rollup(filteredData18, v => {
-			// 	var arr = {};
-			// 	arr["Twitter"] = d3.count(v.web1a)/filteredData18.length;
-			// 	arr["Instagram"] = d3.count(v.web1b)/filteredData18.length;
-			// 	arr["Facebook"] = d3.count(v.web1c)/filteredData18.length;
-			// 	arr["Snapchat"] = d3.count(v.web1d)/filteredData18.length;
-			// 	arr["YouTube"] = d3.count(v.web1e)/filteredData18.length;
-			// 	return arr;
-			// }, d => d.key)
-			console.log(filteredData18);
 			break;
 		case "Race":
 			filteredData18 = d3.nest()
 				.key(d => { return d.racecmb })
+				.rollup(v => {
+					var arr = {};
+					arr["Twitter"] = {
+						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
+					}
+					arr["Instagram"] = {
+						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
+					}
+					arr["Facebook"] = {
+						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
+					}
+					arr["Snapchat"] = {
+						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
+					}
+					arr["YouTube"] = {
+						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
+					}
+					return arr;
+				})
 				.entries(data18);
 			filteredData19 = d3.nest()
 				.key(d => { return d.racecmb })
+				.rollup(v => {
+					var arr = {};
+					arr["Twitter"] = {
+						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
+					}
+					arr["Instagram"] = {
+						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
+					}
+					arr["Facebook"] = {
+						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
+					}
+					arr["Snapchat"] = {
+						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
+					}
+					arr["YouTube"] = {
+						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
+						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
+						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
+						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
+						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
+					}
+					return arr;
+				})
 				.entries(data19);
 			break;
 	}
 	plot_sm_lines();
 }
-
-function populate_dropdown() {
-	d3.select('body').append('div').text('Select a question!')
-	d3.select('body').append('div').append('select').selectAll('questions').data(questions).enter().append('option')
-		.text(d => { console.log(d); return d.question }).attr('value', (d, i) => i);
-	// d3.select('select')
-	// 	.on('change', function (d, i) {
-	// 		var datum = d3.select(this).property('value');
-	// 		sentence = lstm_data[datum].sentence;
-	// 		lstm_states = lstm_data[datum].lstm;
-	// 		setup_vis(); // this is what you will implement - called each time a new sentence is chosen
-	// 	})
-}
-
 function plot_books() {
 
 	//filter data
@@ -278,22 +358,39 @@ function filterData() {
 function plot_sm_lines() {
 	console.log("PLOTTING DATA");
 
-	var plot1 = d3.select('#plot1');
+	var svg = d3.select('#svg');
 
-	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width/2]);
-	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height/2 - pad, 0]);
+	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
+	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height / 2 - pad, 0]);
 
-	for(i =0; i < filteredData18.length; i++) {
-		plot1.data(filteredData18[i]).enter()
-			.append()
+	var lineFunction = d3.line()
+		.x(d => { console.log(d); return x_scale(d.key) })
+		.y(d => { return y_scale(d.value) })
+
+	for (i = 0; i < filteredData18.length; i++) {
+		let plot = svg.append('g');
+
+		Object.keys(filteredData18[i].value).forEach(sm => {
+			
+			plot.append('path')
+				.attr("d", lineFunction(filteredData18[i].value[sm]))
+				.attr("fill", "none")
+				.attr("stroke", "steelblue")
+				.attr("stroke-width", 1.5)
+		});
+
+
+		// group that will contain y axis for our line plot (id: yaxis)
+		plot.append('g').attr('id', 'yaxis');
+		// group that will contain x axis for both our line plot and heatmap (id: xaxis)
+		plot.append('g').attr('id', 'xaxis');
 	}
 }
 
 function plot_it() {
 
-	populate_dropdown();
-	setup_plots();
-	plot_books();
+	setup_line_plots();
+	// plot_books();
 
 
 
