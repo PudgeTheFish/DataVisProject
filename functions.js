@@ -24,6 +24,7 @@ var socialsMap = {
 };
 var barSocials = ["Twitter"];
 var toggleLines = true; // set to true for line graphs, false for bar graphs
+var firstToggle = false;
 var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer not to answer"]
 
 function loadJSON(callback, filename) {
@@ -56,7 +57,8 @@ function init() {
 init();
 
 var handleLinesButt = () => {
-	if (toggleLines) return;
+	if (toggleLines && firstToggle) return;
+	firstToggle = true;
 	toggleLines = true;
 	d3.select("#linesButton").attr("style", "background-color: #35c7f0");
 	d3.select("#barsButton").attr("style", "background-color: #d9d9d9");
@@ -66,7 +68,8 @@ var handleLinesButt = () => {
 };
 
 var handleBarsButt = () => {
-	if (!toggleLines) return;
+	if (!toggleLines && firstToggle) return;
+	firstToggle = true;
 	toggleLines = false;
 	d3.select("#linesButton").attr("style", "background-color: #d9d9d9");
 	d3.select("#barsButton").attr("style", "background-color: #35c7f0");
