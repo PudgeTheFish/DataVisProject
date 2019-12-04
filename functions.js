@@ -165,6 +165,14 @@ var filterBooks = (data) => {
 	data['books'] = data.filter(data => parseInt(data.books1) < 98);
 }
 
+var funcMap = {
+	Twitter: filterTwitter,
+	Instagram: filterInsta,
+	Facebook: filterFb,
+	YouTube: filterYt,
+	Snapchat: filterSnap
+};
+
 var setupFilters = () => {
 	d3.select('body').append('div').attr('id', 'filters');
 
@@ -200,7 +208,7 @@ var setupBarFilters = () => {
 		.attr("id", function (d, i) { return d; })
 		.attr('name', 'mode')
 		.attr("onClick", "handleUpdateBars(this)")
-		.property("checked", function (d, i) { return i === 0; });
+		//.property("checked", function (d, i) { return i === 0; });
 };
 
 var handleUpdateSocial = (e) => {
@@ -342,11 +350,9 @@ var plotBars = (filteredData) => {
 	var socialNum = currSocials.length; // number of social media selected, using all for now
 	var currMap = filterMap[currentFilter]; // number of bins (# of groups of bars)
 	var xdomain = [];
-	console.log(currMap);
     for (var i = 0; i < Object.keys(currMap).length	; i++) {
         xdomain.push(i+1);
     }
-	console.log(xdomain);
 	var binNum = xdomain.length;
 
 	var barHeight = 250;
@@ -392,7 +398,7 @@ var plotBars = (filteredData) => {
 			.attr('class', 'serie-rect')
 			.attr("transform", function(d) { return "translate(" + x_inner(d.data.social) + ",0)"; })
 			.attr("x", function(d) { return x_outer(d.data.attr) - outerBarPad; })
-			.attr("y", function(d) { console.log(d); return y_scale(d[1]); })
+			.attr("y", function(d) { return y_scale(d[1]); })
 			.attr("height", function(d) { return y_scale(d[0]) - y_scale(d[1]); })
 			.attr("width", "25px")
 			.attr("fill", (d => { return socialsColors[d.data.social]; }));  //tintScale(i, d.data.social);
@@ -407,7 +413,7 @@ var plotBars = (filteredData) => {
 	svg.append('g').selectAll('circle').data(currSocials).enter()
 		.append('circle')
 		.attr("cx", outerWidth + pad).attr("cy", (d, i) => 100 + i * 30)
-		.attr("r", 6).style("fill", (d, i) => { console.log(d); return socialsColors[d] })
+		.attr("r", 6).style("fill", (d, i) => { return socialsColors[d] })
 	svg.append('g').selectAll('text').data(currSocials).enter()
 		.append("text")
 		.attr("x", outerWidth + pad * 1.2)
@@ -474,6 +480,8 @@ var createSocialArr2 = (arr, v, attrVal, lower, upper) => {
 		arr2[index] = {social: s.name, attr: attrVal};
 		for (var i = 1; i <= 5; i++) {
 			var filteredV = v.filter(d => parseInt(d[s.code])>=lower || parseInt(d[s.code])<=upper);
+			var func = funcMap[s.name];
+			var filteredV = func(filteredV);
 			arr2[index][i] =  v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length;
 			//arr[s.name].push({ key: i, value: v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length });
 		}

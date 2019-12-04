@@ -3,9 +3,13 @@
 }
 
 #filters {
-    //margin: 20px;
+    margin: 20px;
 }
 
 #socialFilters {
     margin-top: 20px;
+}
+
+label {
+    margin-left: 23px;
 }
