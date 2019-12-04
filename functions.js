@@ -8,6 +8,8 @@ var data18 = null; // contains 2018 data in json object
 var data19 = null; // contains 2019 data in json object
 var filteredData18 = null; //contains filtered object
 var filteredData19 = null; //contains filtered object
+var seriesData18 = null;
+var seriesData19 = null;
 var socials = [
 	{ name: "Twitter", code: "sns2a" },
 	{ name: "Instagram", code: "sns2b" },
@@ -22,10 +24,18 @@ var socialsMap = {
 	Snapchat: "sns2d",
 	YouTube: "sns2e"
 };
+var socialsColors = {
+	Twitter: "#00A1AD",
+	Instagram: "#A700F4",
+	Facebook: "#0064B7",
+	Snapchat: "#EFA700",
+	YouTube: "#AD0B00"
+};
 var barSocials = ["Twitter"];
 var toggleLines = true; // set to true for line graphs, false for bar graphs
 var firstToggle = false;
-var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer not to answer"]
+var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer not to answer"];
+var currentFilter = null;
 
 function loadJSON(callback, filename) {
 
@@ -163,7 +173,6 @@ var handleUpdateSocial = (e) => {
 	if (!e.checked) {
 		barSocials = barSocials.filter(s => s !== e.id); 
 	}
-	console.log(barSocials);
 	plotBars();
 };
 
@@ -184,14 +193,17 @@ var setupBarSocials = () => {
 	.property("checked", function (d, i) { return i === 0; });
 };
 
+//console.log(data19.filter(d => {  return d.racecmb == "9";}));
+
 var handleUpdateBars = (e) => {
+	currentFilter = e.id;
 	switch (e.id) {
 		case "Sex":
 			filteredData18 = d3.nest()
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr2(arr,v);
 					return arr;
 				})
 				.entries(data18);
@@ -199,11 +211,10 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr2(arr,v);
 					return arr;
 				})
 				.entries(data19);
-			console.log(filteredData18);
 			break;
 
 		case "Race":
@@ -211,53 +222,165 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr2(arr,v,v[0].racecmb);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
-				.entries(data18);
+				.entries(data18)
+				.filter(d => d.key !== "9"); 
 			filteredData19 = d3.nest()
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr(arr,v);
+					arr = createSocialArr2(arr,v,v[0].racecmb);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
-				.entries(data19);
+				.entries(data19)
+				.filter(d => d.key !== "9");
 			break;
-		plotBars();
+			
 	};
+	//console.log(filteredData18)
+	plotBars(filteredData18);
+	//console.log("raw filteredData18");
+
 };
 
-var plotBars = () => {
+var plotBars = (filteredData) => {
+	if (!filteredData) return;
 	var svg = d3.select('#barsSvg');
 	svg.selectAll('g').remove(); //clear plots
 	let plot = svg.append('g').attr('id', 'plot');
 
-	var socialNum = barSocials.length; // number of social media selected, using all for now
+	var socialNum = 5; // number of social media selected, using all for now
 	var binNum = 5; // number of bins (# of groups of bars)
 
+	var barHeight = 250;
 	var barWidth = 25;
 	var barPad = 7;
-	var outerBarPad = 15;
+	var outerBarPad = 5;
 	var innerWidth = socialNum * (2*barPad+barWidth);
 	var innerWidthPad = innerWidth + 2*outerBarPad; 
 	var outerWidth = innerWidthPad * binNum;
+	console.log("innerwidthpad: " + innerWidthPad);
+	console.log("outerwidth: " + outerWidth);
 
-	var x_inner = d3.scaleBand().domain(barSocials).range([0, innerWidth]).padding(barPad);
-	var x_outer = d3.scaleLinear().domain([0, binNum-1]).range([0, outerWidth]);
+	var x_inner = d3.scaleBand().domain(socials.map(d => d.name)).range([0, innerWidth]).padding(barPad);
+	var x_outer = d3.scaleBand().domain(['1','2','3','4','5']).range([0, outerWidth]);
 
-	var y_scale = d3.scaleLinear().domain([0, 1]).range([lines_height / 2 - pad, 0]);
-	var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#E74C3C", "#8E44AD", "#3498DB", "#1ABC9C", "#F39C12"]);
+	var y_scale = d3.scaleLinear().domain([0, 1]).range([barHeight, 0]);
+	var colorScale = d3.scaleOrdinal().domain(socials.map(d => d.name)).range(["#00C7D6", "#AE00F9", "#006AC6", "#FFB600", "#D11100"]);
+
+	//console.log(filteredData18);
+	//if (filteredData18 == null) plotBars();
+	filteredData.forEach(fd => {
+		var data = fd.value;
+		//console.log("pre");
+		//console.log(fd.value);
+		fd.value = d3.stack().keys(data.columns.slice(1))(data);
+		fd.value = fd.value.map(d => {
+			//console.log(JSON.parse(JSON.stringify(d.key)));
+			var key = JSON.parse(JSON.stringify(d.key));
+			//var key = d.key;
+			d = d.map(e => {
+				//console.log(key);
+				e.data.freq = key;
+				//console.log(e.data);
+				return e;
+			});
+			return d;
+		});
+		//console.log("post");
+		//console.log(fd.value);
+	});
+	//console.log("series filtered");
+
+	//console.log(filteredData);
+	var opacityScale = d3.scaleLinear().domain([0,4]).range([1,0.12]);
+
+	filteredData.forEach(fd => {
+		//console.log(index);
+		//console.log(fd.value);
+		var serie = svg.append('g').selectAll('.serie')
+					.data(fd.value)
+					.enter().append('g')
+						.attr("class", "serie")
+						.attr("opacity", (d,i) => { console.log(i); return opacityScale(i);})
+
+						
+	
+		serie.selectAll('rect')
+		//.data((d,i) => {return {d: d, i: i}; })
+		.data(d => d)
+		.enter().append('rect')
+			.attr('class', 'serie-rect')
+			.attr("transform", function(d) { return "translate(" + x_inner(d.data.social) + ",0)"; })
+			.attr("x", function(d) { /*console.log( x_outer(d.data.attr));*/ return x_outer(d.data.attr); })
+			.attr("y", function(d) { return y_scale(d[1]); })
+			.attr("height", function(d) { return y_scale(d[0]) - y_scale(d[1]); })
+			.attr("width", "25px")
+			.attr("fill", (d => { return socialsColors[d.data.social]; }));  //tintScale(i, d.data.social);
+
+
+		
+	});
+	
+	
+	/*
+	var index = 0
+	filteredData18.map(fd => {
+		//console.log(fd);
+		//fd.value.map(data => {
+			svg.append('g')
+			.selectAll('g')
+			.data(fd.value)
+			.enter().append('g')
+				.attr("fill", d => { console.log(d); return tintScale(d.key,"d.data.data.name");})
+			.selectAll('rect')
+			.data(d => d)
+			.enter().append('rect')
+				.attr('x', (d,i) => {
+					//console.log(d);
+					return outerBarPad + index*(innerWidthPad+outerBarPad) + x_inner(d.data.name);
+				})
+				.attr('y', d => y_scale(d[0]) - y_scale(d[1]))
+				.attr('width', x_inner.bandwidth());
+		//})
+		
+		index++;
+	});
+	*/
+	
 
 	plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
 	//plot.append('g').attr('id', 'xaxis').call(d3.axisLeft(y_scale));
 
 };
 
+var tintScale = (input, social) => {
+	if (social == "Twitter") {
+		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#003438","#00636B","#00939E","#00C7D6","#0AEEFF"]);
+	}
+	if (social == "Instagram") {
+		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#7200A3","#9500D6","#B50AFF","#DB89FF","#E3A3FF"]);
+	}
+	if (social == "Facebook") {
+		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#003360","#00549E","#0074DB","#2398FF","#75BEFF"]);
+	}
+	if (social == "Snapchat") {
+		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#996D00","#CC9200","#F4AF00","#FFC532","#FFDC84"]);
+	}
+	if (social == "YouTube") {
+		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#7F0800","#B20B00","#DB0E00","#FF746B","#FFB7B2"]);
+	}
+	return scale(input);
+};
+
 var setup_bar_plots = () => {
 	setupBarFilters();
 	setupBarSocials();
-	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)').attr("id", "barsParent");
+	d3.select('body').append('svg').attr('width', 2000).attr('height', 2000).attr('transform', 'translate(5,5)').attr("id", "barsParent");
 	d3.select('#barsParent').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'barsSvg');
 	plotBars();
 }
@@ -287,6 +410,7 @@ function setup_line_plots() {
 }
 
 var createSocialArr = (arr, v) => {
+
 	socials.map(s => {
 		arr[s.name] = [];
 		for (var i = 1; i <= 5; i++) {
@@ -294,6 +418,23 @@ var createSocialArr = (arr, v) => {
 		}
 	});
 	return arr;
+};
+
+// attrVal is like male/female, hispanic/asian/black, etc
+var createSocialArr2 = (arr, v, attrVal) => {
+	arr2 = [];
+	var index = 0;
+	socials.map(s => {
+		//arr2.push({});
+		arr2[index] = {social: s.name, attr: attrVal};
+		for (var i = 1; i <= 5; i++) {
+			var filteredV = v.filter(d => parseInt(d[s.code])>=1 || parseInt(d[s.code])<=5);
+			arr2[index][i] =  v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length;
+			//arr[s.name].push({ key: i, value: v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length });
+		}
+		index++;
+	});
+	return arr2;
 };
 
 function handleUpdateLines(e) {
@@ -324,7 +465,8 @@ function handleUpdateLines(e) {
 					arr = createSocialArr(arr, v);
 					return arr;
 				})
-				.entries(data18);
+				.entries(data18)
+				.filter(d => d.key !== "9");
 			filteredData19 = d3.nest()
 				.key(d => { return d.racecmb })
 				.rollup(v => {
@@ -332,7 +474,8 @@ function handleUpdateLines(e) {
 					arr = createSocialArr(arr, v);
 					return arr;
 				})
-				.entries(data19);
+				.entries(data19)
+				.filter(d => d.key !== "9"); 
 			break;
 	}
 	plot_sm_lines();
@@ -340,7 +483,6 @@ function handleUpdateLines(e) {
 
 
 function plot_sm_lines() {
-	console.log("PLOTTING DATA");
 
 	var svg = d3.select('#svg');
 	svg.selectAll('g').remove(); //clear plots
@@ -364,7 +506,6 @@ function plot_sm_lines() {
 				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 2 + ')');
 		}
 
-		//console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach((sm, index) => {
 			// get the array we want
 			arr = filteredData18[i].value[sm];
