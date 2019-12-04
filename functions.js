@@ -17,6 +17,9 @@ var socials = [
 	{ name: "Snapchat", code: "sns2d" },
 	{ name: "YouTube", code: "sns2e" }
 ];
+
+var currSocials = ["Twitter"];
+
 var socialsMap = {
 	Twitter: "sns2a",
 	Instagram: "sns2b",
@@ -31,11 +34,26 @@ var socialsColors = {
 	Snapchat: "#EFA700",
 	YouTube: "#AD0B00"
 };
-var barSocials = ["Twitter"];
 var toggleLines = true; // set to true for line graphs, false for bar graphs
 var firstToggle = false;
 var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer not to answer"];
 var currentFilter = null;
+var raceMap = {
+	1: "White",
+	2: "Black",
+	3: "Asian",
+	4: "Other",
+	5: "Native Amer."
+};
+var sexMap = {
+	1: "Male",
+	2: "Female"
+};
+
+var filterMap = {
+	Race: raceMap,
+	Sex: sexMap
+};
 
 function loadJSON(callback, filename) {
 
@@ -163,14 +181,14 @@ var setupBarFilters = () => {
 
 var handleUpdateSocial = (e) => {
 	if (e.checked) {
-		if (!barSocials.includes(e.id)) {
-			barSocials.push(e.id);
+		if (!currSocials.includes(e.id)) {
+			currSocials.push(e.id);
 		}
 	}	
 	if (!e.checked) {
-		barSocials = barSocials.filter(s => s !== e.id); 
+		currSocials = currSocials.filter(s => s !== e.id); 
 	}
-	plotBars();
+	handleUpdateBars();
 };
 
 var setupBarSocials = () => {
@@ -178,7 +196,7 @@ var setupBarSocials = () => {
 
 	d3.select('#socialFilters').append('form')
 	.selectAll("label")
-	.data(["Twitter", "YouTube"])
+	.data(["Twitter", "Instagram", "Facebook", "Snapchat", "YouTube"])
 	.enter()
 	.append("label")
 	.text(function (d) { return d; })
@@ -190,21 +208,17 @@ var setupBarSocials = () => {
 	.property("checked", function (d, i) { return i === 0; });
 };
 
-//console.log(data19.filter(d => {  return d.racecmb == "9";}));
 
 var handleUpdateBars = (e) => {
-	currentFilter = e.id;
-	switch (e.id) {
+	if (e) currentFilter = e.id;
+	switch (currentFilter) {
 		case "Sex":
 			filteredData18 = d3.nest()
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-<<<<<<< HEAD
-					arr = createSocialArr2(arr,v);
-=======
-					arr = createSocialArr(arr, v);
->>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
+					arr = createSocialArr2(arr,v, v[0].sex);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
 				.entries(data18);
@@ -212,11 +226,8 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-<<<<<<< HEAD
-					arr = createSocialArr2(arr,v);
-=======
-					arr = createSocialArr(arr, v);
->>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
+					arr = createSocialArr2(arr,v, v[0].sex);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
 				.entries(data19);
@@ -227,12 +238,8 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-<<<<<<< HEAD
 					arr = createSocialArr2(arr,v,v[0].racecmb);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
-=======
-					arr = createSocialArr(arr, v);
->>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data18)
@@ -241,12 +248,8 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-<<<<<<< HEAD
 					arr = createSocialArr2(arr,v,v[0].racecmb);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
-=======
-					arr = createSocialArr(arr, v);
->>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data19)
@@ -254,9 +257,7 @@ var handleUpdateBars = (e) => {
 			break;
 			
 	};
-	//console.log(filteredData18)
 	plotBars(filteredData18);
-	//console.log("raw filteredData18");
 
 };
 
@@ -266,8 +267,15 @@ var plotBars = (filteredData) => {
 	svg.selectAll('g').remove(); //clear plots
 	let plot = svg.append('g').attr('id', 'plot');
 
-	var socialNum = 5; // number of social media selected, using all for now
-	var binNum = 5; // number of bins (# of groups of bars)
+	var socialNum = currSocials.length; // number of social media selected, using all for now
+	var currMap = filterMap[currentFilter]; // number of bins (# of groups of bars)
+	var xdomain = [];
+	console.log(currMap);
+    for (var i = 0; i < Object.keys(currMap).length	; i++) {
+        xdomain.push(i+1);
+    }
+	console.log(xdomain);
+	var binNum = xdomain.length;
 
 	var barHeight = 250;
 	var barWidth = 25;
@@ -276,60 +284,42 @@ var plotBars = (filteredData) => {
 	var innerWidth = socialNum * (2*barPad+barWidth);
 	var innerWidthPad = innerWidth + 2*outerBarPad; 
 	var outerWidth = innerWidthPad * binNum;
-	console.log("innerwidthpad: " + innerWidthPad);
-	console.log("outerwidth: " + outerWidth);
 
-	var x_inner = d3.scaleBand().domain(socials.map(d => d.name)).range([0, innerWidth]).padding(barPad);
-	var x_outer = d3.scaleBand().domain(['1','2','3','4','5']).range([0, outerWidth]);
+	var x_inner = d3.scaleBand().domain(currSocials).range([0, innerWidth]).padding(barPad);
+	var x_outer = d3.scaleBand().domain(xdomain).range([0, outerWidth]);
 
 	var y_scale = d3.scaleLinear().domain([0, 1]).range([barHeight, 0]);
-	var colorScale = d3.scaleOrdinal().domain(socials.map(d => d.name)).range(["#00C7D6", "#AE00F9", "#006AC6", "#FFB600", "#D11100"]);
+	var colorScale = d3.scaleOrdinal().domain(currSocials).range(["#00C7D6", "#AE00F9", "#006AC6", "#FFB600", "#D11100"]);
 
-	//console.log(filteredData18);
-	//if (filteredData18 == null) plotBars();
 	filteredData.forEach(fd => {
 		var data = fd.value;
-		//console.log("pre");
-		//console.log(fd.value);
 		fd.value = d3.stack().keys(data.columns.slice(1))(data);
 		fd.value = fd.value.map(d => {
-			//console.log(JSON.parse(JSON.stringify(d.key)));
 			var key = JSON.parse(JSON.stringify(d.key));
-			//var key = d.key;
 			d = d.map(e => {
-				//console.log(key);
 				e.data.freq = key;
-				//console.log(e.data);
 				return e;
 			});
 			return d;
 		});
-		//console.log("post");
-		//console.log(fd.value);
 	});
-	//console.log("series filtered");
-
-	//console.log(filteredData);
 	var opacityScale = d3.scaleLinear().domain([0,4]).range([1,0.12]);
 
 	filteredData.forEach(fd => {
-		//console.log(index);
-		//console.log(fd.value);
 		var serie = svg.append('g').selectAll('.serie')
 					.data(fd.value)
 					.enter().append('g')
 						.attr("class", "serie")
-						.attr("opacity", (d,i) => { console.log(i); return opacityScale(i);})
+						.attr("opacity", (d,i) => { return opacityScale(i);})
 
 						
 	
 		serie.selectAll('rect')
-		//.data((d,i) => {return {d: d, i: i}; })
 		.data(d => d)
 		.enter().append('rect')
 			.attr('class', 'serie-rect')
 			.attr("transform", function(d) { return "translate(" + x_inner(d.data.social) + ",0)"; })
-			.attr("x", function(d) { /*console.log( x_outer(d.data.attr));*/ return x_outer(d.data.attr); })
+			.attr("x", function(d) { return x_outer(d.data.attr); })
 			.attr("y", function(d) { return y_scale(d[1]); })
 			.attr("height", function(d) { return y_scale(d[0]) - y_scale(d[1]); })
 			.attr("width", "25px")
@@ -339,36 +329,20 @@ var plotBars = (filteredData) => {
 		
 	});
 	
-	
-	/*
-	var index = 0
-	filteredData18.map(fd => {
-		//console.log(fd);
-		//fd.value.map(data => {
-			svg.append('g')
-			.selectAll('g')
-			.data(fd.value)
-			.enter().append('g')
-				.attr("fill", d => { console.log(d); return tintScale(d.key,"d.data.data.name");})
-			.selectAll('rect')
-			.data(d => d)
-			.enter().append('rect')
-				.attr('x', (d,i) => {
-					//console.log(d);
-					return outerBarPad + index*(innerWidthPad+outerBarPad) + x_inner(d.data.name);
-				})
-				.attr('y', d => y_scale(d[0]) - y_scale(d[1]))
-				.attr('width', x_inner.bandwidth());
-		//})
-		
-		index++;
-	});
-	*/
-	
-
 	plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
-	//plot.append('g').attr('id', 'xaxis').call(d3.axisLeft(y_scale));
-
+	plot.append('g').attr('id', 'xaxis').call(d3.axisBottom(x_outer).tickFormat(d => currMap[d])).attr("transform", "translate(0," + barHeight + ")")
+		
+	svg.append('g').selectAll('circle').data(currSocials).enter()
+		.append('circle')
+		.attr("cx", outerWidth + pad).attr("cy", (d, i) => 100 + i * 30)
+		.attr("r", 6).style("fill", (d, i) => { console.log(d); return socialsColors[d] })
+	svg.append('g').selectAll('text').data(currSocials).enter()
+		.append("text")
+		.attr("x", outerWidth + pad * 1.2)
+		.attr("y", (d, i) => 100 + i * 30)
+		.text(d => d)
+		.style("font-size", "15px")
+		.attr("alignment-baseline", "middle")
 };
 
 var tintScale = (input, social) => {
@@ -424,7 +398,7 @@ var createSocialArr2 = (arr, v, attrVal) => {
 	arr2 = [];
 	var index = 0;
 	socials.map(s => {
-		//arr2.push({});
+		if (!currSocials.includes(s.name)) return;
 		arr2[index] = {social: s.name, attr: attrVal};
 		for (var i = 1; i <= 5; i++) {
 			var filteredV = v.filter(d => parseInt(d[s.code])>=1 || parseInt(d[s.code])<=5);
@@ -517,7 +491,6 @@ function plot_sm_lines() {
 				.attr("stroke-width", 3);
 		});
 
-		//console.log(filteredData18[i].value);
 		Object.keys(filteredData19[i].value).forEach((sm, index) => {
 			// get the array we want
 			arr = filteredData19[i].value[sm];
