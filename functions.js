@@ -177,7 +177,7 @@ function plot_sm_lines() {
 		Object.keys(filteredData18[i].value).forEach(sm => {
 			console.log(sm)
 			// get the array we want
-			arr = filteredData18[i].value[sm];		
+			arr = filteredData18[i].value[sm];	
 			plot.append('path')
 				.datum(arr)
 				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => {console.log(d.value); return y_scale(d.value)}))
