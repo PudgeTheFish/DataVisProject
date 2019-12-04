@@ -50,9 +50,29 @@ var sexMap = {
 	2: "Female"
 };
 
+var partyMap = {
+	1: "Republican",
+	2: "Democrat",
+	3: "Independent"
+};
+
+var incomeMap = {
+	1: "<10k",
+	2: "10-20k",
+	3: "20-30k",
+	4: "30-40k",
+	5: "40-50k",
+	6: "50-75k",
+	7: "75-100k",
+	8: "100-150k",
+	9: ">150k"
+}
+
 var filterMap = {
 	Race: raceMap,
-	Sex: sexMap
+	Sex: sexMap,
+	"Political Party": partyMap,
+	Income: incomeMap
 };
 
 function loadJSON(callback, filename) {
@@ -117,6 +137,10 @@ var filterTwitter = (data) => {
 	return data.filter(data => parseInt(data.sns2a) >= 1 && parseInt(data.sns2a) <= 5);
 }
 
+var filterRace = (data) => {
+	return data.filter(data => parseInt(data.racecmb) >= 1 && parseInt(data.racecmb) <= 5);
+}
+
 var filterInsta = (data) => {
 	return data.filter(data => parseInt(data.sns2b) >= 1 && parseInt(data.sns2b) <= 5);
 }
@@ -167,7 +191,7 @@ var setupBarFilters = () => {
 
 	d3.select('#filters').append('form')
 		.selectAll("label")
-		.data(["Sex", "Race"])
+		.data(["Sex", "Race", "Political Party", "Income"])
 		.enter()
 		.append("label")
 		.text(function (d) { return d; })
@@ -217,7 +241,7 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr2(arr,v, v[0].sex);
+					arr = createSocialArr2(arr,v, v[0].sex, 1, 2);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
@@ -226,7 +250,7 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr = createSocialArr2(arr,v, v[0].sex);
+					arr = createSocialArr2(arr,v, v[0].sex, 1, 2);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
@@ -234,26 +258,74 @@ var handleUpdateBars = (e) => {
 			break;
 
 		case "Race":
+			fData18 = filterRace(data18);
 			filteredData18 = d3.nest()
 				.key(d => { return d.racecmb })
 				.rollup(v => {
+					v = v.filter(d => d.key !== "9");
 					var arr = {};
-					arr = createSocialArr2(arr,v,v[0].racecmb);
+					arr = createSocialArr2(arr,v,v[0].racecmb, 1, 5);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
-				.entries(data18)
+				.entries(fData18)
 				.filter(d => d.key !== "9"); 
 			filteredData19 = d3.nest()
 				.key(d => { return d.racecmb })
 				.rollup(v => {
+					v = v.filter(d => d.key !== "9");
 					var arr = {};
-					arr = createSocialArr2(arr,v,v[0].racecmb);
+					arr = createSocialArr2(arr,v,v[0].racecmb, 1, 5);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
 					return arr;
 				})
 				.entries(data19)
 				.filter(d => d.key !== "9");
+			break;
+
+			case "Political Party":
+			filteredData18 = d3.nest()
+				.key(d => { return d.party })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].party, 1, 3);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data18)
+				.filter(d => d.key >= "1" && d.key <= "3"); 
+			filteredData19 = d3.nest()
+				.key(d => { return d.party })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].party, 1, 3);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data19)
+				.filter(d => d.key >= "1" && d.key <= "3"); 
+			break;
+			case "Income":
+			filteredData18 = d3.nest()
+				.key(d => { return d.inc })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].inc, 1, 9);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data18)
+				.filter(d => d.key >= "1" && d.key <= "9"); 
+			filteredData19 = d3.nest()
+				.key(d => { return d.inc })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].inc, 1, 9);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data19)
+				.filter(d => d.key >= "1" && d.key <= "9"); 
 			break;
 			
 	};
@@ -319,8 +391,8 @@ var plotBars = (filteredData) => {
 		.enter().append('rect')
 			.attr('class', 'serie-rect')
 			.attr("transform", function(d) { return "translate(" + x_inner(d.data.social) + ",0)"; })
-			.attr("x", function(d) { return x_outer(d.data.attr); })
-			.attr("y", function(d) { return y_scale(d[1]); })
+			.attr("x", function(d) { return x_outer(d.data.attr) - outerBarPad; })
+			.attr("y", function(d) { console.log(d); return y_scale(d[1]); })
 			.attr("height", function(d) { return y_scale(d[0]) - y_scale(d[1]); })
 			.attr("width", "25px")
 			.attr("fill", (d => { return socialsColors[d.data.social]; }));  //tintScale(i, d.data.social);
@@ -394,14 +466,14 @@ var createSocialArr = (arr, v) => {
 };
 
 // attrVal is like male/female, hispanic/asian/black, etc
-var createSocialArr2 = (arr, v, attrVal) => {
+var createSocialArr2 = (arr, v, attrVal, lower, upper) => {
 	arr2 = [];
 	var index = 0;
 	socials.map(s => {
 		if (!currSocials.includes(s.name)) return;
 		arr2[index] = {social: s.name, attr: attrVal};
 		for (var i = 1; i <= 5; i++) {
-			var filteredV = v.filter(d => parseInt(d[s.code])>=1 || parseInt(d[s.code])<=5);
+			var filteredV = v.filter(d => parseInt(d[s.code])>=lower || parseInt(d[s.code])<=upper);
 			arr2[index][i] =  v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length;
 			//arr[s.name].push({ key: i, value: v.filter(data => parseInt(data[s.code]) == i).length / filteredV.length });
 		}
