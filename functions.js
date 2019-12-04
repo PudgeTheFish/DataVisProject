@@ -45,6 +45,9 @@ function init() {
 
 init();
 
+// add the buttons to toggle between line and stacked bar charts
+d3.select('body').append('button').attr('id', 'linesButton').text("Line graphs");
+d3.select('body').append('button').attr('id', 'barsButton').text("Stacked bar graphs");
 
 
 var filterTwitter = (data) => {
