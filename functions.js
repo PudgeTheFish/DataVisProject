@@ -18,6 +18,7 @@ var socials = [
 	{ name: "YouTube", code: "sns2e" }
 ];
 var toggleLines = true; // set to true for line graphs, false for bar graphs
+var races = ["White", "Black", "Asian", "Other", "Native American", "Prefer not to answer"]
 
 function loadJSON(callback, filename) {
 
@@ -118,7 +119,7 @@ var setupFilters = () => {
 		.property("checked", function (d, i) { return i === 0; });
 
 	document.getElementById("Race").checked = true;
-	handleUpdate(document.getElementById("Race"))
+	// handleUpdate(document.getElementById("Race"))
 };
 
 function setup_bar_plots() {
