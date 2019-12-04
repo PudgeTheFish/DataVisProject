@@ -46,6 +46,7 @@ function init() {
 init();
 
 
+
 var filterTwitter = (data) => {
 	return data.filter(data => parseInt(data.sns2a) >= 1 && parseInt(data.sns2a) <= 5);
 }
@@ -176,7 +177,7 @@ function plot_sm_lines() {
 	var svg = d3.select('#svg');
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
-	var y_scale = d3.scaleLinear().domain([0, .1]).range([lines_height / 2 - pad, 0]);
+	var y_scale = d3.scaleLinear().domain([0, 1]).range([lines_height / 2 - pad, 0]);
 
 	var lineFunction = d3.line()
 		.x(d => { /*console.log(d);*/ return x_scale(d.key) })
