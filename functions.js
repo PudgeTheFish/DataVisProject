@@ -26,17 +26,14 @@ function loadJSON(callback, filename) {
 
 
 function init() {
-	console.log("INIT");
 	loadJSON(function (response) {
 		// Parsing JSON string into object
 		data18 = JSON.parse(response);
-		console.log(data18);
 	}, 'data_2018.json');
 
 	loadJSON(function (response) {
 		// Parsing JSON string into object
 		data19 = JSON.parse(response);
-		console.log(data19);
 	}, 'data_2019.json');
 }
 
@@ -327,21 +324,24 @@ function plot_sm_lines() {
 	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height / 2 - pad, 0]);
 
 	var lineFunction = d3.line()
-		.x(d => { console.log(d); return x_scale(d.key) })
+		.x(d => { /*console.log(d);*/ return x_scale(d.key) })
 		.y(d => { return y_scale(d.value) })
-
 	for (i = 0; i < filteredData18.length; i++) {
-		let plot = svg.append('g');
-
+		let plot = svg.append('g').attr('id', 'plot');
+		console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach(sm => {
-			
+			// get the object we want
+			obj = filteredData18[i].value[sm];		
+			// convert to an array of objects
+			const arr = Object.keys(obj).map(i => ({key: i, value: obj[i]}))
+			console.log(arr);
 			plot.append('path')
-				.attr("d", lineFunction(filteredData18[i].value[sm]))
+				.datum(arr)
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { console.log(y_scale(d.value)); return y_scale(d.value);}))
 				.attr("fill", "none")
 				.attr("stroke", "steelblue")
-				.attr("stroke-width", 1.5)
+				.attr("stroke-width", 1.5);
 		});
-
 
 		// group that will contain y axis for our line plot (id: yaxis)
 		plot.append('g').attr('id', 'yaxis');
