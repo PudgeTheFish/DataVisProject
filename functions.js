@@ -8,6 +8,7 @@ var data18 = null; // contains 2018 data in json object
 var data19 = null; // contains 2019 data in json object
 var filteredData18 = null; //contains filtered object
 var filteredData19 = null; //contains filtered object
+var socials = ["Twitter", "Instagram", "Facebook", "Snapchat", "YouTube"];
 
 
 function loadJSON(callback, filename) {
@@ -39,34 +40,6 @@ function init() {
 
 init();
 
-// Each array contains the full set of data where the 
-// values for the specified field are all valid
-var processData = (csv, obj) => {
-	obj = $.csv.toObjects(csv);
-	//console.log(obj);
-	//obj = filterTwitter(obj);
-	// console.log("twitter data");
-	// console.log(twitter);
-	//obj['insta'] = filterInsta(obj);
-	// console.log("insta data");
-	// console.log(insta);
-	//obj['fb'] = filterFb(obj);
-	// console.log("fb data");
-	// console.log(fb);
-	//obj['snap'] = filterSnap(obj);
-	// console.log("snap data");
-	// console.log(snap);
-	//obj['yt'] = filterYt(obj);
-	// console.log("Yt data");
-	// console.log(yt);
-	//obj['intmob'] = filterIntmob(obj);
-	// console.log("intmob data");
-	// console.log(intmob);
-	//obj['books'] = filterBooks(obj);
-	// console.log("books data");
-	// console.log(books);
-	//console.log(obj)
-};
 
 var filterTwitter = (data) => {
 	return data.filter(data => parseInt(data.sns2a) >= 1 && parseInt(data.sns2a) <= 5);
@@ -136,6 +109,16 @@ function setup_line_plots() {
 	// 	.attr("onClick", "handleUpdate()");
 }
 
+var createSocialArr = (arr,v) => {
+	socials.map(s => {
+		arr[s] = [];
+		for (var i=1; i<=5; i++) {
+			arr[s].push({ key: i, value: v.filter(data => parseInt(data.sns2a) == i).length / v.length});
+		}
+	});
+	return arr;
+};
+
 function handleUpdate(e) {
 	switch (e.id) {
 		case "Sex":
@@ -143,41 +126,7 @@ function handleUpdate(e) {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr["Twitter"] = {
-						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
-					}
-					arr["Instagram"] = {
-						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
-					}
-					arr["Facebook"] = {
-						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
-					}
-					arr["Snapchat"] = {
-						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
-					}
-					arr["YouTube"] = {
-						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
-					}
+					arr = createSocialArr(arr,v);
 					return arr;
 				})
 				.entries(data18);
@@ -185,41 +134,7 @@ function handleUpdate(e) {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
-					arr["Twitter"] = {
-						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
-					}
-					arr["Instagram"] = {
-						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
-					}
-					arr["Facebook"] = {
-						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
-					}
-					arr["Snapchat"] = {
-						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
-					}
-					arr["YouTube"] = {
-						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
-					}
+					arr = createSocialArr(arr,v);
 					return arr;
 				})
 				.entries(data19);
@@ -229,41 +144,7 @@ function handleUpdate(e) {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr["Twitter"] = {
-						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
-					}
-					arr["Instagram"] = {
-						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
-					}
-					arr["Facebook"] = {
-						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
-					}
-					arr["Snapchat"] = {
-						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
-					}
-					arr["YouTube"] = {
-						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
-					}
+					arr = createSocialArr(arr,v);
 					return arr;
 				})
 				.entries(data18);
@@ -271,41 +152,7 @@ function handleUpdate(e) {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
-					arr["Twitter"] = {
-						1: v.filter(data => parseInt(data.sns2a) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2a) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2a) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2a) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2a) == 5).length / v.length,
-					}
-					arr["Instagram"] = {
-						1: v.filter(data => parseInt(data.sns2b) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2b) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2b) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2b) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2b) == 5).length / v.length,
-					}
-					arr["Facebook"] = {
-						1: v.filter(data => parseInt(data.sns2c) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2c) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2c) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2c) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2c) == 5).length / v.length,
-					}
-					arr["Snapchat"] = {
-						1: v.filter(data => parseInt(data.sns2d) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2d) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2d) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2d) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2d) == 5).length / v.length,
-					}
-					arr["YouTube"] = {
-						1: v.filter(data => parseInt(data.sns2e) == 1).length / v.length,
-						2: v.filter(data => parseInt(data.sns2e) == 2).length / v.length,
-						3: v.filter(data => parseInt(data.sns2e) == 3).length / v.length,
-						4: v.filter(data => parseInt(data.sns2e) == 4).length / v.length,
-						5: v.filter(data => parseInt(data.sns2e) == 5).length / v.length,
-					}
+					arr = createSocialArr(arr,v);
 					return arr;
 				})
 				.entries(data19);
@@ -328,16 +175,13 @@ function plot_sm_lines() {
 		.y(d => { return y_scale(d.value) })
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot');
-		console.log(filteredData18[i].value);
+		//console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach(sm => {
-			// get the object we want
-			obj = filteredData18[i].value[sm];		
-			// convert to an array of objects
-			const arr = Object.keys(obj).map(i => ({key: i, value: obj[i]}))
-			console.log(arr);
+			// get the array we want
+			arr = filteredData18[i].value[sm];		
 			plot.append('path')
 				.datum(arr)
-				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { console.log(y_scale(d.value)); return y_scale(d.value);}))
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => y_scale(d.value)))
 				.attr("fill", "none")
 				.attr("stroke", "steelblue")
 				.attr("stroke-width", 1.5);
