@@ -116,8 +116,72 @@ var setupFilters = () => {
 		.property("checked", function (d, i) { return i === 0; });
 };
 
-function setup_bar_plots() {
+var setupBarFilters = () => {
+	d3.select('body').append('div').attr('id', 'filters');
 
+	d3.select('#filters').append('text').text('Filters');
+
+	d3.select('#filters').append('form')
+		.selectAll("label")
+		.data(["Sex", "Race"])
+		.enter()
+		.append("label")
+		.text(function (d) { return d; })
+		.insert('input')
+		.attr("type", "radio")
+		.attr("id", function (d, i) { return d; })
+		.attr('name', 'mode')
+		.attr("onClick", "handleUpdateBars(this)")
+		.property("checked", function (d, i) { return i === 0; });
+};
+
+var handleUpdateBars = (e) => {
+	switch (e.id) {
+		case "Sex":
+			filteredData18 = d3.nest()
+				.key(d => { return d.sex })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr,v);
+					return arr;
+				})
+				.entries(data18);
+			filteredData19 = d3.nest()
+				.key(d => { return d.sex })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr,v);
+					return arr;
+				})
+				.entries(data19);
+			console.log(filteredData18);
+			break;
+
+		case "Race":
+			filteredData18 = d3.nest()
+				.key(d => { return d.racecmb })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr,v);
+					return arr;
+				})
+				.entries(data18);
+			filteredData19 = d3.nest()
+				.key(d => { return d.racecmb })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr,v);
+					return arr;
+				})
+				.entries(data19);
+			break;
+	};
+};
+
+var setup_bar_plots = () => {
+	setupBarFilters();
+	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)').attr("id", "barsParent");
+	d3.select('#barsParent').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'barsSvg');
 }
 
 //Create SVG elements and perform transforms to prepare for visualization
