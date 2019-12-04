@@ -57,6 +57,8 @@ var handleBarsButt = () => {
 	toggleLines = false;
 	d3.select("#linesButton").attr("style", "background-color: #d9d9d9");
 	d3.select("#barsButton").attr("style", "background-color: #35c7f0");
+	d3.selectAll("#parentSvg").remove();
+	d3.selectAll("#filters").remove();
 	setup_bar_plots();
 };
 
@@ -121,7 +123,7 @@ function setup_bar_plots() {
 //Create SVG elements and perform transforms to prepare for visualization
 function setup_line_plots() {
 	setupFilters();
-	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
+	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)').attr("id", "parentSvg");
 
 	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
 	
