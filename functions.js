@@ -67,12 +67,20 @@ var incomeMap = {
 	8: "100-150k",
 	9: ">150k"
 }
-
+var maritalMap = {
+	1: "Married",
+	2: "Cohabiting w/ partner",
+	3: "Divorced",
+	4: "Separated",
+	5: "Widowed",
+	6: "Never married"
+};
 var filterMap = {
 	Race: raceMap,
 	Sex: sexMap,
 	"Political Party": partyMap,
-	Income: incomeMap
+	Income: incomeMap,
+	Marital: maritalMap
 };
 
 function loadJSON(callback, filename) {
@@ -103,6 +111,8 @@ function init() {
 }
 
 init();
+
+console.log(data18);
 
 var handleLinesButt = () => {
 	if (toggleLines && firstToggle) return;
@@ -180,7 +190,7 @@ var setupFilters = () => {
 
 	d3.select('#filters').append('form')
 		.selectAll("label")
-		.data(["Race", "Sex"])
+		.data(["Race", "Sex", "Political Party", "Income", "Marital"])
 		.enter()
 		.append("label")
 		.text(function (d) { return d; })
@@ -199,7 +209,7 @@ var setupBarFilters = () => {
 
 	d3.select('#filters').append('form')
 		.selectAll("label")
-		.data(["Sex", "Race", "Political Party", "Income"])
+		.data(["Sex", "Race", "Political Party", "Income", "Marital"])
 		.enter()
 		.append("label")
 		.text(function (d) { return d; })
@@ -313,6 +323,7 @@ var handleUpdateBars = (e) => {
 				.entries(data19)
 				.filter(d => d.key >= "1" && d.key <= "3"); 
 			break;
+
 			case "Income":
 			filteredData18 = d3.nest()
 				.key(d => { return d.inc })
@@ -334,6 +345,29 @@ var handleUpdateBars = (e) => {
 				})
 				.entries(data19)
 				.filter(d => d.key >= "1" && d.key <= "9"); 
+			break;
+
+			case "Marital":
+			filteredData18 = d3.nest()
+				.key(d => { return d.marital })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].marital, 1, 6);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data18)
+				.filter(d => d.key >= "1" && d.key <= "6"); 
+			filteredData19 = d3.nest()
+				.key(d => { return d.marital })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].marital, 1, 6);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data19)
+				.filter(d => d.key >= "1" && d.key <= "6"); 
 			break;
 			
 	};
@@ -453,7 +487,7 @@ var setup_bar_plots = () => {
 //Create SVG elements and perform transforms to prepare for visualization
 function setup_line_plots() {
 	setupFilters();
-	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)').attr("id", "parentSvg");
+	d3.select('body').append('svg').attr('width', 1000).attr('height', 10000).attr('transform', 'translate(5,5)').attr("id", "parentSvg");
 
 	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
 	document.getElementById("Race").click()
@@ -491,6 +525,7 @@ var createSocialArr2 = (arr, v, attrVal, lower, upper) => {
 };
 
 function handleUpdateLines(e) {
+	if (e) currentFilter = e.id;
 	switch (e.id) {
 		case "Sex":
 			filteredData18 = d3.nest()
@@ -530,6 +565,68 @@ function handleUpdateLines(e) {
 				.entries(data19)
 				.filter(d => d.key !== "9"); 
 			break;
+		case "Political Party":
+				filteredData18 = d3.nest()
+					.key(d => { return d.party })
+					.rollup(v => {
+						var arr = {};
+						arr = createSocialArr(arr, v);
+						return arr;
+					})
+					.entries(data18)
+					.filter(d => d.key >= "1" && d.key <= "3");
+				filteredData19 = d3.nest()
+					.key(d => { return d.party })
+					.rollup(v => {
+						var arr = {};
+						arr = createSocialArr(arr, v);
+						return arr;
+					})
+					.entries(data19)
+					.filter(d => d.key >= "1" && d.key <= "3");
+				break;
+
+		case "Income":
+				filteredData18 = d3.nest()
+					.key(d => { return d.inc })
+					.rollup(v => {
+						var arr = {};
+						arr = createSocialArr(arr, v);
+						return arr;
+					})
+					.entries(data18)
+					.filter(d => d.key <= "9");
+				filteredData19 = d3.nest()
+					.key(d => { return d.inc })
+					.rollup(v => {
+						var arr = {};
+						arr = createSocialArr(arr, v);
+						return arr;
+					})
+					.entries(data19)
+					.filter(d => d.key <= "9"); 
+				break;
+
+		case "Marital":
+			filteredData18 = d3.nest()
+				.key(d => { return d.marital })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr, v);
+					return arr;
+				})
+				.entries(data18)
+				.filter(d => d.key >= "1" && d.key <= "6"); 
+			filteredData19 = d3.nest()
+				.key(d => { return d.marital })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr, v);
+					return arr;
+				})
+				.entries(data19)
+				.filter(d => d.key >= "1" && d.key <= "6"); 
+			break;
 	}
 	plot_sm_lines();
 }
@@ -543,22 +640,31 @@ function plot_sm_lines() {
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
 	var y_scale = d3.scaleLinear().domain([0, .5]).range([lines_height / 2 - pad, 0]);
 	var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#E74C3C", "#8E44AD", "#3498DB", "#1ABC9C", "#F39C12"]);
-
+	console.log(filteredData18);
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot')
-			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad - 20)) + ',' + (Math.trunc(i / 2 % 3) * (lines_height / 2 - pad / 2)) + ')');
+			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad - 20)) + ',' + (Math.trunc(i / 2 % 5) * (lines_height / 2 - pad / 2)) + ')');
+		console.log(filteredData18.length);
+		var currMap = filterMap[currentFilter];
 
-		if (filteredData18.length == 2) {
+		plot.append('text').text(currMap[i+1])
+		.attr('text-anchor', 'center')
+		.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
+		/*
+		var currMap = filterMap[currentFilter];
+		if (currentFilter == "Sex") {
 			var sexes = ["Male", "Female"]
-			plot.append('text').text(sexes[i])
+			plot.append('text').text(currMap[i+1])
 				.attr('text-anchor', 'center')
-				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 2 + ')');
-		} else if (filteredData18.length == 6) {
-			plot.append('text').text(races[i])
+				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
+	
+		} else if (currentFilter == "Race") {
+			plot.append('text').text(currMap[i+1])
 				.attr('text-anchor', 'center')
-				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 2 + ')');
+				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
+		
 		}
-
+		*/
 		Object.keys(filteredData18[i].value).forEach((sm, index) => {
 			// get the array we want
 			arr = filteredData18[i].value[sm];
@@ -582,25 +688,29 @@ function plot_sm_lines() {
 				.attr("fill", "none")
 				.attr("stroke", colorScale(index))
 				.attr("stroke-width", 3);
+			console.log(arr);
 		});
 
-		if (i == 0 || i == 2 || i == 4) {
-			// group that will contain y axis for our line plot (id: yaxis)
-			plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
-		}
+		// group that will contain y axis for our line plot (id: yaxis)
+		plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
+
+		
+		
 
 		let yaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
 		// group that will contain x axis for both our line plot and heatmap (id: xaxis)
+		var plotheight = lines_height/2 - pad;
 		plot.append('g').attr('id', 'xaxis')
-			.call(d3.axisTop(x_scale).ticks(5)
+			.call(d3.axisBottom(x_scale).ticks(5)
 				.tickFormat(i => { return yaxis[i - 1] }))
-			.attr('transform', 'translate(0' + ',' + 0 + ')');
+				.attr("transform", "translate(0," + plotheight + ")")
+			//.attr('transform', 'translate(0' + ',' + 0 + ')');
 	}
 	//add legend
 	svg.append('g').selectAll('circle').data(socials).enter()
 		.append('circle')
 		.attr("cx", lines_width + pad * 1.5).attr("cy", (d, i) => 100 + i * 30)
-		.attr("r", 6).style("fill", (d, i) => { console.log(d); return colorScale(i) })
+		.attr("r", 6).style("fill", (d, i) => { return colorScale(i) })
 	svg.append('g').selectAll('text').data(socials).enter()
 		.append("text")
 		.attr("x", lines_width + pad * 1.6)
