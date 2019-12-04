@@ -15,6 +15,7 @@ var socials = [
 	{ name: "Snapchat", code: "sns2d" },
 	{ name: "YouTube", code: "sns2e" }
 ];
+var toggleLines = true; // set to true for line graphs, false for bar graphs
 
 function loadJSON(callback, filename) {
 
@@ -45,9 +46,25 @@ function init() {
 
 init();
 
+var handleLinesButt = () => {
+	toggleLines = true;
+	d3.select("#linesButton").attr("style", "background-color: #35c7f0");
+	d3.select("#barsButton").attr("style", "background-color: #d9d9d9");
+	setup_line_plots();
+};
+
+var handleBarsButt = () => {
+	toggleLines = false;
+	d3.select("#linesButton").attr("style", "background-color: #d9d9d9");
+	d3.select("#barsButton").attr("style", "background-color: #35c7f0");
+	setup_bar_plots();
+};
+
 // add the buttons to toggle between line and stacked bar charts
-d3.select('body').append('button').attr('id', 'linesButton').text("Line graphs");
-d3.select('body').append('button').attr('id', 'barsButton').text("Stacked bar graphs");
+d3.select('body').append('button').attr('id', 'linesButton').text("Line graphs")
+	.attr("onClick", "handleLinesButt(this)");
+d3.select('body').append('button').attr('id', 'barsButton').text("Stacked bar graphs")
+	.attr("onClick", "handleBarsButt(this)");
 
 
 var filterTwitter = (data) => {
@@ -93,9 +110,13 @@ var setupFilters = () => {
 		.attr("type", "radio")
 		.attr("id", function (d, i) { return d; })
 		.attr('name', 'mode')
-		.attr("onClick", "handleUpdate(this)")
+		.attr("onClick", "handleUpdateLines(this)")
 		.property("checked", function (d, i) { return i === 0; });
 };
+
+function setup_bar_plots() {
+
+}
 
 //Create SVG elements and perform transforms to prepare for visualization
 function setup_line_plots() {
@@ -131,7 +152,7 @@ var createSocialArr = (arr,v) => {
 	return arr;
 };
 
-function handleUpdate(e) {
+function handleUpdateLines(e) {
 	switch (e.id) {
 		case "Sex":
 			filteredData18 = d3.nest()
@@ -207,9 +228,4 @@ function plot_sm_lines() {
 			.tickFormat(i => { return yaxis[i - 1] }))
 			.attr('transform', 'translate(0' + ',' + (lines_height/2 - pad) + ')');
 	}
-}
-function plot_it() {
-
-	setup_line_plots();
-
 }
