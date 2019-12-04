@@ -15,8 +15,6 @@ var socials = [
 	{ name: "Snapchat", code: "sns2d" },
 	{ name: "YouTube", code: "sns2e" }
 ];
-var socialKeys = ["sns2a", "sns2b", "sns2c", "sns2d", "sns2e"];
-
 
 function loadJSON(callback, filename) {
 
@@ -76,13 +74,8 @@ var filterBooks = (data) => {
 	data['books'] = data.filter(data => parseInt(data.books1) < 98);
 }
 
-//Create SVG elements and perform transforms to prepare for visualization
-function setup_line_plots() {
+var setupFilters = () => {
 	d3.select('body').append('div').attr('id', 'filters');
-	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
-
-	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
-
 
 	d3.select('#filters').append('text').text('Filters');
 
@@ -98,7 +91,15 @@ function setup_line_plots() {
 		.attr('name', 'mode')
 		.attr("onClick", "handleUpdate(this)")
 		.property("checked", function (d, i) { return i === 0; });
+};
 
+//Create SVG elements and perform transforms to prepare for visualization
+function setup_line_plots() {
+	setupFilters();
+	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)')
+
+	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
+	
 	// d3.select('#filters').append('div')
 	// 	.attr('id', 'raceCheckbox')
 	// 	.append('text').text('Race: ')
@@ -205,8 +206,5 @@ function plot_sm_lines() {
 function plot_it() {
 
 	setup_line_plots();
-	// plot_books();
-
-
 
 }
