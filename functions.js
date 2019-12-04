@@ -1,8 +1,6 @@
 // widths and heights for our plots - you should use these in constructing scales
 var width = 1500, height = 1500;
 var pad = 80;
-var width = 1000, height = 1000;
-var pad = 25;
 var lines_width = width / 2 - (2 * pad);
 var lines_height = height / 2 - (2 * pad);
 var data = null;
