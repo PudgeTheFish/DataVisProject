@@ -140,9 +140,6 @@ var setupFilters = () => {
 		.attr('name', 'mode')
 		.attr("onClick", "handleUpdateLines(this)")
 		.property("checked", function (d, i) { return i === 0; });
-
-	document.getElementById("Race").checked = true;
-	// handleUpdate(document.getElementById("Race"))
 };
 
 var setupBarFilters = () => {
@@ -203,7 +200,11 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
+<<<<<<< HEAD
 					arr = createSocialArr2(arr,v);
+=======
+					arr = createSocialArr(arr, v);
+>>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data18);
@@ -211,7 +212,11 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.sex })
 				.rollup(v => {
 					var arr = {};
+<<<<<<< HEAD
 					arr = createSocialArr2(arr,v);
+=======
+					arr = createSocialArr(arr, v);
+>>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data19);
@@ -222,8 +227,12 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
+<<<<<<< HEAD
 					arr = createSocialArr2(arr,v,v[0].racecmb);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
+=======
+					arr = createSocialArr(arr, v);
+>>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data18)
@@ -232,8 +241,12 @@ var handleUpdateBars = (e) => {
 				.key(d => { return d.racecmb })
 				.rollup(v => {
 					var arr = {};
+<<<<<<< HEAD
 					arr = createSocialArr2(arr,v,v[0].racecmb);
 					arr.columns = ["social", "1", "2", "3", "4", "5"];
+=======
+					arr = createSocialArr(arr, v);
+>>>>>>> c0125d6730e59187cd545a42134fad7b0747db55
 					return arr;
 				})
 				.entries(data19)
@@ -391,22 +404,8 @@ function setup_line_plots() {
 	d3.select('body').append('svg').attr('width', 1000).attr('height', 1000).attr('transform', 'translate(5,5)').attr("id", "parentSvg");
 
 	d3.select('svg').append('g').attr('transform', 'translate(' + pad + ',' + pad + ')').attr('id', 'svg');
+	document.getElementById("Race").click()
 
-	// d3.select('#filters').append('div')
-	// 	.attr('id', 'raceCheckbox')
-	// 	.append('text').text('Race: ')
-	// d3.select('#filters').select('#raceCheckbox')
-	// 	.selectAll("input")
-	// 	.data(["White", "Black", "Asian", "Other", "Native American", "Pacific Islander", "Hispanic"])
-	// 	.enter()
-	// 	.append('label')
-	// 	.attr('for', function (d, i) { return i + 1; })
-	// 	.text(function (d) { return d; })
-	// 	.append("input")
-	// 	.attr("checked", true)
-	// 	.attr("type", "checkbox")
-	// 	.attr("id", function (d, i) { return i + 1; })
-	// 	.attr("onClick", "handleUpdate()");
 }
 
 var createSocialArr = (arr, v) => {
@@ -518,6 +517,20 @@ function plot_sm_lines() {
 				.attr("stroke-width", 3);
 		});
 
+		//console.log(filteredData18[i].value);
+		Object.keys(filteredData19[i].value).forEach((sm, index) => {
+			// get the array we want
+			arr = filteredData19[i].value[sm];
+			plot.append('path')
+				.datum(arr)
+				.attr('data-legend', sm)
+				.style("stroke-dasharray", ("3, 3"))
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { return y_scale(d.value) }))
+				.attr("fill", "none")
+				.attr("stroke", colorScale(index))
+				.attr("stroke-width", 3);
+		});
+
 		if (i == 0 || i == 2 || i == 4) {
 			// group that will contain y axis for our line plot (id: yaxis)
 			plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
@@ -542,6 +555,42 @@ function plot_sm_lines() {
 		.text(d => d.name)
 		.style("font-size", "15px")
 		.attr("alignment-baseline", "middle")
+	var legend_lines = {
+		"dashed": [
+			[700, 40],
+			[715, 40]],
+		"normal": [
+			[700, 70],
+			[715, 70]]
+	}
+	svg.append('g').attr('id', 'dashed').append('path')
+		.attr('d', d3.line()(legend_lines.dashed))
+		.style("stroke-dasharray", ("3, 3"))
+		.attr('fill', 'none')
+		.attr('stroke', 'black')
+		.attr('stroke-width', 3)
+		.append('text')
+	svg.select('#dashed')
+		.append('text')
+		.text("2019")
+		.style("font-size", "15px")
+		.attr("alignment-baseline", "middle")
+		.attr("x", lines_width + pad * 1.6)
+		.attr('y', 40)
+
+	svg.append('g').attr('id', 'dashed').append('path')
+		.attr('d', d3.line()(legend_lines.normal))
+		.attr('fill', 'none')
+		.attr('stroke', 'black')
+		.attr('stroke-width', 3)
+		.append('text')
+	svg.select('#dashed')
+		.append('text')
+		.text("2018")
+		.style("font-size", "15px")
+		.attr("alignment-baseline", "middle")
+		.attr("x", lines_width + pad * 1.6)
+		.attr('y', 70)
 	// svg.append("text").attr("x", 220).attr("y", 160).text("variable B").style("font-size", "15px").attr("alignment-baseline", "middle")
 
 }
