@@ -166,31 +166,34 @@ function plot_sm_lines() {
 	console.log("PLOTTING DATA");
 
 	var svg = d3.select('#svg');
+	svg.selectAll('g').remove(); //clear plots
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
-	var y_scale = d3.scaleLinear().domain([0, 100]).range([lines_height / 2 - pad, 0]);
+	var y_scale = d3.scaleLinear().domain([0, .3]).range([lines_height / 2 - pad, 0]);
 
-	var lineFunction = d3.line()
-		.x(d => { /*console.log(d);*/ return x_scale(d.key) })
-		.y(d => { return y_scale(d.value) })
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot');
 		//console.log(filteredData18[i].value);
 		Object.keys(filteredData18[i].value).forEach(sm => {
+			console.log(sm)
 			// get the array we want
 			arr = filteredData18[i].value[sm];		
 			plot.append('path')
 				.datum(arr)
-				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => y_scale(d.value)))
+				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => {console.log(d.value); return y_scale(d.value)}))
 				.attr("fill", "none")
 				.attr("stroke", "steelblue")
 				.attr("stroke-width", 1.5);
 		});
 
 		// group that will contain y axis for our line plot (id: yaxis)
-		plot.append('g').attr('id', 'yaxis');
+		plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
+		let  yaxis = [">1 per day", "1 per day", ">3 per week", "<1 per week", "Less often"];
 		// group that will contain x axis for both our line plot and heatmap (id: xaxis)
-		plot.append('g').attr('id', 'xaxis');
+		plot.append('g').attr('id', 'xaxis')
+			.call(d3.axisBottom(x_scale).ticks(5)
+			.tickFormat(i => { return yaxis[i - 1] }))
+			.attr('transform', 'translate(0' + ',' + (lines_height/2 - pad) + ')');
 	}
 }
 
