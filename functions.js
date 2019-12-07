@@ -75,72 +75,22 @@ var maritalMap = {
 	5: "Widowed",
 	6: "Never married"
 };
+var booksMap = {
+	1: "0",
+	2: "1-3",
+	3: "4-10",
+	4: "11-30",
+	5: "31-50",
+	6: "50+"
+}
 var filterMap = {
 	Race: raceMap,
 	Sex: sexMap,
 	"Political Party": partyMap,
 	Income: incomeMap,
-	Marital: maritalMap
+	Marital: maritalMap,
+	Books: booksMap
 };
-
-function loadJSON(callback, filename) {
-
-	var xobj = new XMLHttpRequest();
-	xobj.overrideMimeType("application/json");
-	xobj.open('GET', filename, false); // Replace 'appDataServices' with the path to your file
-	xobj.onreadystatechange = function () {
-		if (xobj.readyState == 4 && xobj.status == "200") {
-			// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-			callback(xobj.responseText);
-		}
-	};
-	xobj.send(null);
-}
-
-
-function init() {
-	loadJSON(function (response) {
-		// Parsing JSON string into object
-		data18 = JSON.parse(response);
-	}, 'data_2018.json');
-
-	loadJSON(function (response) {
-		// Parsing JSON string into object
-		data19 = JSON.parse(response);
-	}, 'data_2019.json');
-}
-
-init();
-
-console.log(data18);
-
-var handleLinesButt = () => {
-	if (toggleLines && firstToggle) return;
-	firstToggle = true;
-	toggleLines = true;
-	d3.select("#linesButton").attr("style", "background-color: #35c7f0");
-	d3.select("#barsButton").attr("style", "background-color: #d9d9d9");
-	d3.selectAll("#filters").remove();
-	d3.selectAll("#barsParent").remove();
-	setup_line_plots();
-};
-
-var handleBarsButt = () => {
-	if (!toggleLines && firstToggle) return;
-	firstToggle = true;
-	toggleLines = false;
-	d3.select("#linesButton").attr("style", "background-color: #d9d9d9");
-	d3.select("#barsButton").attr("style", "background-color: #35c7f0");
-	d3.selectAll("#parentSvg").remove();
-	d3.selectAll("#filters").remove();
-	setup_bar_plots();
-};
-
-// add the buttons to toggle between line and stacked bar charts
-d3.select('body').append('button').attr('id', 'linesButton').text("Line graphs")
-	.attr("onClick", "handleLinesButt(this)");
-d3.select('body').append('button').attr('id', 'barsButton').text("Stacked bar graphs")
-	.attr("onClick", "handleBarsButt(this)");
 
 
 var filterTwitter = (data) => {
@@ -172,8 +122,101 @@ var filterIntmob = (data) => {
 }
 
 var filterBooks = (data) => {
-	data['books'] = data.filter(data => parseInt(data.books1) < 98);
+	return data.filter(data => parseInt(data.books1) < 98);
 }
+
+var binBooks = (data) => {
+	return data.map(d => {
+		var books = parseInt(d.books1);
+		var newBooks = null;
+		if (books == 0) {
+			newBooks =  '1';
+		}
+		else if (books >= 1 && books <= 3) {
+			newBooks = '2';
+		}
+		else if (books >= 4 && books <= 10) {
+			newBooks = '3';
+		}
+		else if (books >= 11 && books <= 30) {
+			newBooks = '4';
+		}
+		else if (books >= 31 && books <= 50) {
+			newBooks = '5';
+		}
+		else {
+			newBooks = '6';
+		}
+		d.books1 = newBooks;
+		return d;
+	});
+};
+
+function loadJSON(callback, filename) {
+
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', filename, false); // Replace 'appDataServices' with the path to your file
+	xobj.onreadystatechange = function () {
+		if (xobj.readyState == 4 && xobj.status == "200") {
+			// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+			callback(xobj.responseText);
+		}
+	};
+	xobj.send(null);
+}
+
+
+function init() {
+	loadJSON(function (response) {
+		// Parsing JSON string into object
+		data18 = JSON.parse(response);
+	}, 'data_2018.json');
+
+	loadJSON(function (response) {
+		// Parsing JSON string into object
+		data19 = JSON.parse(response);
+	}, 'data_2019.json');
+	data18 = filterBooks(data18);
+	data19 = filterBooks(data19);
+	data18 = binBooks(data18);
+	data19 = binBooks(data19);
+}
+
+init();
+
+
+
+
+console.log(data18);
+
+var handleLinesButt = () => {
+	if (toggleLines && firstToggle) return;
+	firstToggle = true;
+	toggleLines = true;
+	d3.select("#linesButton").attr("style", "background-color: #35c7f0");
+	d3.select("#barsButton").attr("style", "background-color: #d9d9d9");
+	d3.selectAll("#filters").remove();
+	d3.selectAll("#barsParent").remove();
+	setup_line_plots();
+};
+
+var handleBarsButt = () => {
+	if (!toggleLines && firstToggle) return;
+	firstToggle = true;
+	toggleLines = false;
+	d3.select("#linesButton").attr("style", "background-color: #d9d9d9");
+	d3.select("#barsButton").attr("style", "background-color: #35c7f0");
+	d3.selectAll("#parentSvg").remove();
+	d3.selectAll("#filters").remove();
+	setup_bar_plots();
+};
+
+// add the buttons to toggle between line and stacked bar charts
+d3.select('body').append('button').attr('id', 'linesButton').text("Line graphs")
+	.attr("onClick", "handleLinesButt(this)");
+d3.select('body').append('button').attr('id', 'barsButton').text("Stacked bar graphs")
+	.attr("onClick", "handleBarsButt(this)");
 
 var funcMap = {
 	Twitter: filterTwitter,
@@ -190,7 +233,7 @@ var setupFilters = () => {
 
 	d3.select('#filters').append('form')
 		.selectAll("label")
-		.data(["Race", "Sex", "Political Party", "Income", "Marital"])
+		.data(["Race", "Sex", "Political Party", "Income", "Marital", "Books"])
 		.enter()
 		.append("label")
 		.text(function (d) { return d; })
@@ -209,7 +252,7 @@ var setupBarFilters = () => {
 
 	d3.select('#filters').append('form')
 		.selectAll("label")
-		.data(["Sex", "Race", "Political Party", "Income", "Marital"])
+		.data(["Sex", "Race", "Political Party", "Income", "Marital", "Books"])
 		.enter()
 		.append("label")
 		.text(function (d) { return d; })
@@ -369,6 +412,27 @@ var handleUpdateBars = (e) => {
 				.entries(data19)
 				.filter(d => d.key >= "1" && d.key <= "6"); 
 			break;
+
+			case "Books":
+			filteredData18 = d3.nest()
+				.key(d => { return d.books1 })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].books1, 1, 6);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data18)
+			filteredData19 = d3.nest()
+				.key(d => { return d.books1 })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr2(arr,v,v[0].books1, 1, 6);
+					arr.columns = ["social", "1", "2", "3", "4", "5"];
+					return arr;
+				})
+				.entries(data19)
+			break;
 			
 	};
 	plotBars(filteredData18);
@@ -435,14 +499,14 @@ var plotBars = (filteredData) => {
 			.attr("y", function(d) { return y_scale(d[1]); })
 			.attr("height", function(d) { return y_scale(d[0]) - y_scale(d[1]); })
 			.attr("width", "25px")
-			.attr("fill", (d => { return socialsColors[d.data.social]; }));  //tintScale(i, d.data.social);
-
-
+			.attr("fill", (d => { return socialsColors[d.data.social]; }));  
 		
 	});
 	
-	plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale));
-	plot.append('g').attr('id', 'xaxis').call(d3.axisBottom(x_outer).tickFormat(d => currMap[d])).attr("transform", "translate(0," + barHeight + ")")
+	plot.append('g').attr('id', 'yaxis').call(d3.axisLeft(y_scale)).style("font-size", "13px");
+	plot.append('g').attr('id', 'xaxis').call(d3.axisBottom(x_outer)
+		.tickFormat(d => currMap[d])).attr("transform", "translate(0," + barHeight + ")");
+	plot.selectAll('#xaxis').selectAll('text').attr("transform", "rotate(-35)").style("text-anchor", "end").style("font-size", "15px")
 		
 	svg.append('g').selectAll('circle').data(currSocials).enter()
 		.append('circle')
@@ -455,25 +519,6 @@ var plotBars = (filteredData) => {
 		.text(d => d)
 		.style("font-size", "15px")
 		.attr("alignment-baseline", "middle")
-};
-
-var tintScale = (input, social) => {
-	if (social == "Twitter") {
-		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#003438","#00636B","#00939E","#00C7D6","#0AEEFF"]);
-	}
-	if (social == "Instagram") {
-		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#7200A3","#9500D6","#B50AFF","#DB89FF","#E3A3FF"]);
-	}
-	if (social == "Facebook") {
-		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#003360","#00549E","#0074DB","#2398FF","#75BEFF"]);
-	}
-	if (social == "Snapchat") {
-		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#996D00","#CC9200","#F4AF00","#FFC532","#FFDC84"]);
-	}
-	if (social == "YouTube") {
-		var scale = d3.scaleOrdinal().domain(["1","2","3","4","5"]).range(["#7F0800","#B20B00","#DB0E00","#FF746B","#FFB7B2"]);
-	}
-	return scale(input);
 };
 
 var setup_bar_plots = () => {
@@ -627,6 +672,24 @@ function handleUpdateLines(e) {
 				.entries(data19)
 				.filter(d => d.key >= "1" && d.key <= "6"); 
 			break;
+		case "Books":
+			filteredData18 = d3.nest()
+				.key(d => { return d.books1 })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr, v);
+					return arr;
+				})
+				.entries(data18)
+			filteredData19 = d3.nest()
+				.key(d => { return d.books1 })
+				.rollup(v => {
+					var arr = {};
+					arr = createSocialArr(arr, v);
+					return arr;
+				})
+				.entries(data19)
+			break;
 	}
 	plot_sm_lines();
 }
@@ -677,7 +740,7 @@ function plot_sm_lines() {
 				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { return y_scale(d.value) }))
 				.attr("fill", "none")
 				.attr("stroke", colorScale(index))
-				.attr("stroke-width", 3);
+				.attr("stroke-width", 2);
 		});
 
 		Object.keys(filteredData19[i].value).forEach((sm, index) => {
@@ -690,7 +753,7 @@ function plot_sm_lines() {
 				.attr("d", d3.line().x(d => x_scale(d.key)).y(d => { return y_scale(d.value) }))
 				.attr("fill", "none")
 				.attr("stroke", colorScale(index))
-				.attr("stroke-width", 3);
+				.attr("stroke-width", 2);
 			console.log(arr);
 		});
 
