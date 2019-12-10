@@ -480,6 +480,13 @@ var plotBars = (filteredData) => {
 		});
 	});
 	var opacityScale = d3.scaleLinear().domain([0,4]).range([1,0.12]);
+	var opacities = [0.12, 0.3399, 0.56, 0.78, 1];
+	var levels = ["Less often",
+					"Every few weeks",
+					"A few times a week",
+					"About once a day",
+					"Several times a day"];
+
 
 	filteredData.forEach(fd => {
 		var serie = svg.append('g').selectAll('.serie')
@@ -518,7 +525,22 @@ var plotBars = (filteredData) => {
 		.attr("y", (d, i) => 100 + i * 30)
 		.text(d => d)
 		.style("font-size", "15px")
+		.attr("alignment-baseline", "middle");
+
+	svg.append('g').selectAll('rect').data(opacities).enter()
+		.append('rect')
+		.attr("x", outerWidth + pad*2.2).attr("y", (d, i) => 83 + i * 30)
+		.attr("width", "30px").attr("height", "30px")
+		.style("fill", d => "hsla(0, 1%, 33%, " + d + ")")
+	svg.append('g').selectAll('text').data(levels).enter()
+		.append("text")
+		.attr("x", outerWidth + pad * 2.7)
+		.attr("y", (d, i) => 99 + i * 30)
+		.text(d => d)
+		.style("font-size", "15px")
 		.attr("alignment-baseline", "middle")
+
+
 };
 
 var setup_bar_plots = () => {
@@ -702,35 +724,17 @@ function plot_sm_lines() {
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
 	var y_scale = d3.scaleLinear().domain([0, .5]).range([lines_height / 2 - pad, 0]);
-	//var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#E74C3C", "#8E44AD", "#3498DB", "#1ABC9C", "#F39C12"]);
 	var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#00A1AD", "#A700F4", "#0064B7", "#EFA700", "#AD0B00"]);
 
-
-	console.log(filteredData18);
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot')
 			.attr('transform', 'translate(' + ((i % 2) * (lines_width / 2 + pad - 20)) + ',' + (Math.trunc(i / 2 % 5) * (lines_height / 2 - pad / 2)) + ')');
-		console.log(filteredData18.length);
 		var currMap = filterMap[currentFilter];
 
 		plot.append('text').text(currMap[i+1])
 		.attr('text-anchor', 'center')
 		.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
-		/*
-		var currMap = filterMap[currentFilter];
-		if (currentFilter == "Sex") {
-			var sexes = ["Male", "Female"]
-			plot.append('text').text(currMap[i+1])
-				.attr('text-anchor', 'center')
-				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
-	
-		} else if (currentFilter == "Race") {
-			plot.append('text').text(currMap[i+1])
-				.attr('text-anchor', 'center')
-				.attr('transform', 'translate(' + (lines_width / 4) + ',' + pad / 5 + ')');
-		
-		}
-		*/
+
 		Object.keys(filteredData18[i].value).forEach((sm, index) => {
 			// get the array we want
 			arr = filteredData18[i].value[sm];
@@ -754,7 +758,6 @@ function plot_sm_lines() {
 				.attr("fill", "none")
 				.attr("stroke", colorScale(index))
 				.attr("stroke-width", 2);
-			console.log(arr);
 		});
 
 		// group that will contain y axis for our line plot (id: yaxis)
