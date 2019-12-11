@@ -724,12 +724,8 @@ function plot_sm_lines() {
 
 	var x_scale = d3.scaleLinear().domain([1, 5]).range([0, lines_width / 2]);
 	var y_scale = d3.scaleLinear().domain([0, .5]).range([lines_height / 2 - pad, 0]);
-<<<<<<< HEAD
-	var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#00A1AD", "#A700F4", "#0064B7", "#EFA700", "#AD0B00"]);
-=======
 	//var colorScale = d3.scaleOrdinal().domain([0, 4]).range(["#E74C3C", "#8E44AD", "#3498DB", "#1ABC9C", "#F39C12"]);
 	var colorScale = d3.scaleOrdinal().domain([0,1,2,3,4]).range(["#00acee", "#eb8f34", "#3b5998", "#FFFC00", "#c4302b"]);
->>>>>>> b3dd61385ff760ac03fefac13f82f7febd52d14a
 
 	for (i = 0; i < filteredData18.length; i++) {
 		let plot = svg.append('g').attr('id', 'plot')
